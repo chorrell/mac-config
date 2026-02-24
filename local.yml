@@ -1,0 +1,28 @@
+---
+- name: Configure macOS with ansible-pull
+  hosts: local
+  connection: local
+  become: false
+  gather_facts: true
+
+  pre_tasks:
+    - name: Ensure Python interpreter is available
+      ansible.builtin.debug:
+        msg: "Running with Python {{ ansible_python_version }}"
+
+  roles:
+    - role: base
+      tags: ['system']
+    - role: homebrew
+      tags: ['packages', 'brew']
+    - role: dotfiles
+      tags: ['dotfiles', 'config']
+    - role: vscode
+      tags: ['vscode', 'editor']
+    - role: launchd
+      tags: ['launchd', 'automation']
+
+  post_tasks:
+    - name: Final status message
+      ansible.builtin.debug:
+        msg: "macOS configuration complete!"

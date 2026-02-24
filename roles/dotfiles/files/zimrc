@@ -1,0 +1,23 @@
+# zimfw configuration file
+# See https://zimfw.sh/docs/configuration/
+
+# Prompt theme
+zmodule bira
+
+# Completions
+zmodule zsh-users/zsh-completions
+
+# Syntax highlighting
+zmodule zsh-users/zsh-syntax-highlighting
+
+# Autosuggestions
+zmodule zsh-users/zsh-autosuggestions
+
+# Common utilities
+zmodule utility
+
+# Environment
+zmodule environment
+
+# Git support
+zmodule git

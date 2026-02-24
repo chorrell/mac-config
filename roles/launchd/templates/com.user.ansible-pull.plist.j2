@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>{{ launchd_label }}</string>
+
+    <key>Program</key>
+    <string>/usr/local/bin/ansible-pull</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/local/bin/ansible-pull</string>
+        <string>--url</string>
+        <string>{{ ansible_pull_repo }}</string>
+        <string>--directory</string>
+        <string>{{ ansible_pull_dir }}</string>
+        <string>--checkout</string>
+        <string>main</string>
+        <string>--inventory</string>
+        <string>hosts</string>
+        <string>--only-if-changed</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <{{ run_at_load | lower }}/> 
+
+    <key>StartInterval</key>
+    <integer>{{ start_interval }}</integer>
+
+    <key>StandardOutPath</key>
+    <string>{{ log_path }}/ansible-pull.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>{{ log_path }}/ansible-pull.err</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <key>HOME</key>
+        <string>{{ ansible_user_dir }}</string>
+    </dict>
+
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+    </dict>
+
+    <key>Umask</key>
+    <integer>0022</integer>
+
+    <key>WorkingDirectory</key>
+    <string>{{ ansible_pull_dir }}</string>
+</dict>
+</plist>

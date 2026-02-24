@@ -1,0 +1,6 @@
+---
+- name: run brew bundle
+  ansible.builtin.shell: brew bundle --global --file="{{ ansible_user_dir }}/.Brewfile"
+  listen: "run brew bundle"
+  changed_when: true
+  tags: ['brew']

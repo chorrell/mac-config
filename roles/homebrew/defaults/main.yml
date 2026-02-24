@@ -1,0 +1,19 @@
+---
+# Homebrew role defaults
+install_homebrew: true
+run_brew_bundle: true
+
+# Additional packages to install via homebrew module
+homebrew_packages:
+  - git
+  - zsh
+  - ansible
+  - ripgrep
+  - jq
+  - wget
+  - curl
+
+# Homebrew casks (installed via Brewfile)
+homebrew_casks:
+  - visual-studio-code
+  - iterm2
