@@ -1,0 +1,52 @@
+---
+- name: Create LaunchAgents directory if it doesn't exist
+  ansible.builtin.file:
+    path: "{{ ansible_user_dir }}/Library/LaunchAgents"
+    state: directory
+    mode: '0700'
+  when: setup_auto_update
+  tags: ['launchd']
+
+- name: Template launchd plist file
+  ansible.builtin.template:
+    src: com.user.ansible-pull.plist.j2
+    dest: "{{ launchd_plist_path }}"
+    mode: '0644'
+  notify: load launchd service
+  when: setup_auto_update
+  tags: ['launchd']
+
+- name: Check if launchd service is loaded
+  ansible.builtin.shell: launchctl list | grep {{ launchd_label }}
+  register: launchd_status
+  changed_when: false
+  failed_when: false
+  tags: ['launchd']
+
+- name: Unload existing launchd service if loaded
+  ansible.builtin.shell: launchctl unload {{ launchd_plist_path }}
+  when:
+    - setup_auto_update
+    - launchd_status.rc == 0
+  changed_when: true
+  failed_when: false
+  tags: ['launchd']
+
+- name: Load launchd service
+  ansible.builtin.shell: launchctl load {{ launchd_plist_path }}
+  when: setup_auto_update
+  changed_when: true
+  failed_when: false
+  tags: ['launchd']
+
+- name: Verify launchd service is loaded
+  ansible.builtin.shell: launchctl list | grep {{ launchd_label }}
+  register: final_status
+  changed_when: false
+  failed_when: false
+  tags: ['launchd']
+
+- name: Display launchd status
+  ansible.builtin.debug:
+    msg: "ansible-pull launchd service status: {{ 'Loaded' if final_status.rc == 0 else 'Not loaded' }}"
+  tags: ['launchd']

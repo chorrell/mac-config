@@ -1,0 +1,35 @@
+---
+- name: Create required config directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop: "{{ config_dirs }}"
+  tags: ['always']
+
+- name: Configure macOS system defaults
+  block:
+    - name: Set Dock autohide
+      ansible.builtin.shell: defaults write com.apple.dock autohide -bool true
+      changed_when: false
+      when: configure_system_settings
+
+    - name: Set Finder to show hidden files
+      ansible.builtin.shell: defaults write com.apple.finder AppleShowAllFiles -bool true
+      changed_when: false
+      when: configure_system_settings
+
+    - name: Disable macOS update notifications
+      ansible.builtin.shell: defaults write com.apple.systemupdatenotification ScheduleFrequency -int 0
+      changed_when: false
+      when: configure_system_settings
+
+    - name: Set key repeat rate
+      ansible.builtin.shell: defaults write NSGlobalDomain KeyRepeat -int 2
+      changed_when: false
+      when: configure_system_settings
+
+  rescue:
+    - name: System defaults configuration warning
+      ansible.builtin.debug:
+        msg: "Some system defaults could not be set. This is normal on restricted systems."

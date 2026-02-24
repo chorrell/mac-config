@@ -1,0 +1,44 @@
+---
+- name: Create VS Code User settings directory
+  ansible.builtin.file:
+    path: "{{ vscode_user_settings_path }}"
+    state: directory
+    mode: '0755'
+  when: configure_vscode
+  tags: ['vscode']
+
+- name: Template VS Code settings.json
+  ansible.builtin.template:
+    src: settings.json.j2
+    dest: "{{ vscode_user_settings_path }}/settings.json"
+    mode: '0644'
+    backup: true
+  when: configure_vscode
+  tags: ['vscode']
+
+- name: Check if VS Code is installed
+  ansible.builtin.shell: which code
+  register: vscode_check
+  changed_when: false
+  failed_when: false
+  tags: ['vscode']
+
+- name: Install VS Code extensions
+  block:
+    - name: Install each extension
+      ansible.builtin.shell: code --install-extension {{ item }}
+      loop: "{{ vscode_extensions }}"
+      register: extension_install
+      changed_when: "'already installed' not in extension_install.stderr"
+      failed_when: false
+
+  when:
+    - configure_vscode
+    - vscode_check.rc == 0
+  tags: ['vscode']
+
+- name: Display VS Code status
+  ansible.builtin.debug:
+    msg: "VS Code configuration complete. Settings available at {{ vscode_user_settings_path }}"
+  when: configure_vscode
+  tags: ['vscode']

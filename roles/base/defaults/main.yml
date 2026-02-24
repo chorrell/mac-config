@@ -1,0 +1,10 @@
+---
+# Base role defaults
+configure_system_settings: true
+create_config_directories: true
+
+# Directory setup
+config_dirs:
+  - "{{ ansible_user_dir }}/.config"
+  - "{{ ansible_user_dir }}/.local/bin"
+  - "{{ ansible_user_dir }}/Library/Logs"

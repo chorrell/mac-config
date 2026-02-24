@@ -1,0 +1,31 @@
+---
+# VS Code role defaults
+configure_vscode: true
+vscode_user_settings_path: "{{ ansible_user_dir }}/Library/Application Support/Code/User"
+
+# VS Code extensions to install
+vscode_extensions:
+  - ms-python.python
+  - hashicorp.terraform
+  - redhat.ansible
+  - redhat.vscode-yaml
+  - ms-vscode.makefile-tools
+  - GitHub.copilot
+  - eamodio.gitlens
+  - ms-vscode-remote.remote-ssh
+  - ms-vscode.cpptools
+
+# Default settings (will be templated)
+vscode_settings:
+  "editor.formatOnSave": true
+  "editor.defaultFormatter": null
+  "editor.fontSize": 12
+  "editor.fontFamily": "Monaco, Menlo, monospace"
+  "editor.tabSize": 2
+  "editor.insertSpaces": true
+  "files.exclude":
+    "**/.git": true
+    "**/__pycache__": true
+    "**/*.pyc": true
+  "terminal.integrated.shell.osx": "/usr/local/bin/zsh"
+  "python.linting.enabled": true

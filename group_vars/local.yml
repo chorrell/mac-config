@@ -1,0 +1,33 @@
+---
+# Group variables for local machine
+# Override role defaults here
+
+# Base role settings
+configure_system_settings: true
+create_config_directories: true
+
+# Homebrew settings
+install_homebrew: true
+run_brew_bundle: true
+
+# Dotfiles settings
+configure_zsh: true
+configure_git: true
+install_zimfw: true
+
+# Git configuration - CUSTOMIZE THESE
+git_user_name: "Christopher"
+git_user_email: "your.email@example.com"
+git_default_branch: "main"
+shell_prompt_theme: "bira"
+
+# VS Code settings
+configure_vscode: true
+
+# launchd settings - CUSTOMIZE THE REPO URL
+setup_auto_update: true
+ansible_pull_repo: "https://github.com/YOUR_USERNAME/mac-config.git"
+ansible_pull_dir: "~/.ansible/mac-config"
+launchd_label: "com.user.ansible-pull"
+run_at_load: true
+start_interval: 86400  # 24 hours in seconds

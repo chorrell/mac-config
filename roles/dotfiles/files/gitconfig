@@ -1,0 +1,35 @@
+[core]
+  editor = nano
+  pager = less -x4
+  excludesfile = ~/.gitignore_global
+
+[diff]
+  tool = vimdiff
+
+[merge]
+  tool = vimdiff
+
+[push]
+  default = current
+  autoSetupRemote = true
+
+[pull]
+  rebase = false
+
+[status]
+  showUntrackedFiles = all
+
+[color]
+  ui = true
+
+[alias]
+  st = status
+  co = checkout
+  br = branch
+  ci = commit
+  unstage = reset HEAD --
+  last = log -1 HEAD
+  visual = log --graph --oneline --all
+
+[init]
+  defaultBranch = main
