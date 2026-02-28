@@ -9,11 +9,6 @@
 
 - name: Configure macOS system defaults
   block:
-    - name: Set Dock autohide
-      ansible.builtin.shell: defaults write com.apple.dock autohide -bool true
-      changed_when: false
-      when: configure_system_settings
-
     - name: Set Finder to show hidden files
       ansible.builtin.shell: defaults write com.apple.finder AppleShowAllFiles -bool true
       changed_when: false
