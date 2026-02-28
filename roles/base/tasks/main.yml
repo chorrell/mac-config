@@ -9,15 +9,33 @@
 
 - name: Configure macOS system defaults
   block:
+    - name: Check current Finder hidden files setting
+      ansible.builtin.shell: defaults read com.apple.finder AppleShowAllFiles
+      register: finder_hidden_files_current
+      changed_when: false
+      failed_when: false
+      when: configure_system_settings
+
     - name: Set Finder to show hidden files
       ansible.builtin.shell: defaults write com.apple.finder AppleShowAllFiles -bool true
+      when:
+        - configure_system_settings
+        - finder_hidden_files_current.stdout != "1"
+      changed_when: true
+
+    - name: Check current key repeat rate
+      ansible.builtin.shell: defaults read NSGlobalDomain KeyRepeat
+      register: key_repeat_current
       changed_when: false
+      failed_when: false
       when: configure_system_settings
 
     - name: Set key repeat rate
       ansible.builtin.shell: defaults write NSGlobalDomain KeyRepeat -int 2
-      changed_when: false
-      when: configure_system_settings
+      when:
+        - configure_system_settings
+        - key_repeat_current.stdout != "2"
+      changed_when: true
 
   rescue:
     - name: System defaults configuration warning
