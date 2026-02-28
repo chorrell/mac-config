@@ -1,7 +1,0 @@
----
-- name: load launchd service
-  ansible.builtin.shell: launchctl load {{ launchd_plist_path }}
-  listen: "load launchd service"
-  changed_when: true
-  failed_when: false
-  tags: ['launchd']

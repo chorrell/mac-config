@@ -1,5 +1,5 @@
 ---
-- name: Configure macOS with ansible-pull
+- name: Configure macOS base system
   hosts: local
   connection: local
   become: false
@@ -13,16 +13,8 @@
   roles:
     - role: base
       tags: ['system']
-    - role: homebrew
-      tags: ['packages', 'brew']
-    - role: dotfiles
-      tags: ['dotfiles', 'config']
-    - role: vscode
-      tags: ['vscode', 'editor']
-    - role: launchd
-      tags: ['launchd', 'automation']
 
   post_tasks:
-    - name: Final status message
+    - name: Base system configuration complete
       ansible.builtin.debug:
-        msg: "macOS configuration complete!"
+        msg: "macOS base system configuration complete!"
