@@ -1,7 +1,0 @@
----
-- name: initialize zimfw
-  ansible.builtin.shell: zsh -c "source {{ ansible_user_dir }}/.zim/zimfw.zsh install"
-  listen: "initialize zimfw"
-  changed_when: true
-  failed_when: false
-  tags: ['dotfiles', 'zsh']
