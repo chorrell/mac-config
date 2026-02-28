@@ -14,11 +14,6 @@
       changed_when: false
       when: configure_system_settings
 
-    - name: Disable macOS update notifications
-      ansible.builtin.shell: defaults write com.apple.systemupdatenotification ScheduleFrequency -int 0
-      changed_when: false
-      when: configure_system_settings
-
     - name: Set key repeat rate
       ansible.builtin.shell: defaults write NSGlobalDomain KeyRepeat -int 2
       changed_when: false
