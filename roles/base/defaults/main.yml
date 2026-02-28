@@ -7,4 +7,3 @@ create_config_directories: true
 config_dirs:
   - "{{ ansible_user_dir }}/.config"
   - "{{ ansible_user_dir }}/.local/bin"
-  - "{{ ansible_user_dir }}/Library/Logs"
