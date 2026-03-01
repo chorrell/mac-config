@@ -3,10 +3,10 @@ repos:
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.20.0
     hooks:
-      - id: markdownlint-docker
+      - id: markdownlint
         name: markdownlint
         description: Run markdownlint on markdown files
         entry: markdownlint-cli2
-        language: docker
+        language: node
         types: [markdown]
-        args: []
+        additional_dependencies: ['markdownlint-cli2@0.20.0']
