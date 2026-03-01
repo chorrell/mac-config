@@ -261,15 +261,32 @@ brew doctor
 - Vagrant
 - VirtualBox
 
-### Install Testing Dependencies
+### Set Up Testing Environment
+
+For local testing, create a Python virtual environment to isolate testing dependencies:
 
 ```bash
+# Create virtual environment
+python3 -m venv venv
+
+# Activate virtual environment
+source venv/bin/activate
+
+# Install testing dependencies
 pip install -r requirements.txt
+
+# Install Galaxy collections
+ansible-galaxy collection install -r collections/requirements.yml
 ```
+
+**Note:** Ansible will be installed in the virtual environment alongside Molecule and linting tools. For production/bootstrap, Ansible is installed via Homebrew instead (see `bootstrap.sh`).
 
 ### Run Molecule Tests for a Role
 
 ```bash
+# Ensure venv is activated
+source venv/bin/activate
+
 # Test base role
 cd roles/base
 molecule test
@@ -284,8 +301,17 @@ molecule destroy     # Clean up
 ### Run Linting Only
 
 ```bash
+# Ensure venv is activated
+source venv/bin/activate
+
 yamllint .
 ansible-lint
+```
+
+### Deactivate Virtual Environment
+
+```bash
+deactivate
 ```
 
 ### Manual Configuration Testing
