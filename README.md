@@ -210,8 +210,11 @@ brew doctor
 Install Vagrant and VirtualBox via Homebrew:
 
 ```bash
+# Add HashiCorp tap (for official Vagrant releases)
+brew tap hashicorp/tap
+
 # Install Vagrant
-brew install vagrant
+brew install hashicorp/tap/vagrant
 
 # Install VirtualBox
 brew install --cask virtualbox
