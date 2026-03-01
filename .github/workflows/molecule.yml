@@ -1,0 +1,81 @@
+---
+name: Molecule Testing
+
+on:
+  pull_request:
+    paths:
+      - 'roles/**'
+      - 'molecule/**'
+      - '.github/workflows/molecule.yml'
+      - '.ansible-lint'
+      - '.yamllint'
+      - 'requirements.txt'
+  push:
+    branches:
+      - main
+      - 'feature/**'
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install ansible ansible-lint yamllint
+
+      - name: Run yamllint
+        run: yamllint .
+
+      - name: Run ansible-lint
+        run: ansible-lint
+
+  test:
+    name: Test Role - ${{ matrix.role }}
+    runs-on: macos-latest
+    needs: lint
+    strategy:
+      matrix:
+        role:
+          - base
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+
+      - name: Install Vagrant
+        run: brew install --cask vagrant
+
+      - name: Install VirtualBox (Vagrant provider)
+        run: brew install --cask virtualbox
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          ansible-galaxy collection install -r collections/requirements.yml
+
+      - name: Run Molecule tests
+        run: |
+          cd roles/${{ matrix.role }}
+          molecule test
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'

@@ -50,3 +50,9 @@ roles/dotfiles/files/zimrc.local
 # Logs
 *.log
 logs/
+
+# Molecule
+.molecule/
+.cache/
+molecule/**/.vagrant/
+roles/**/molecule/**/.vagrant/
