@@ -56,3 +56,6 @@ logs/
 .cache/
 molecule/**/.vagrant/
 roles/**/molecule/**/.vagrant/
+
+# Pre-commit
+.pre-commit-framework/
