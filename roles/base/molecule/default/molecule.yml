@@ -5,24 +5,20 @@ dependency:
     requirements-file: ../../../../collections/requirements.yml
 
 driver:
-  name: vagrant
-  provider:
-    name: virtualbox
+  name: default
 
 platforms:
-  - name: macos-test
-    box: generic/macos13
-    memory: 2048
-    cpus: 2
+  - name: localhost
 
 provisioner:
   name: ansible
   config_options:
     defaults:
-      callbacks_enabled: profile_tasks
+      callbacks_enabled: profile_tasks,timer
   inventory:
     host_vars:
-      macos-test:
+      localhost:
+        ansible_connection: local
         ansible_python_interpreter: /usr/bin/python3
 
 verifier:

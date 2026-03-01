@@ -1,7 +1,8 @@
 ---
 - name: Verify
-  hosts: all
+  hosts: localhost
   gather_facts: true
+  connection: local
   tasks:
     - name: Check .config directory exists
       ansible.builtin.stat:

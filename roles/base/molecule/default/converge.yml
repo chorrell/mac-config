@@ -1,7 +1,8 @@
 ---
 - name: Converge
-  hosts: all
+  hosts: localhost
   gather_facts: true
+  connection: local
   tasks:
     - name: Include base role
       ansible.builtin.include_role:
