@@ -202,8 +202,32 @@ brew doctor
 ### Testing Prerequisites
 
 - Python 3.11+
-- Vagrant
-- VirtualBox
+- Vagrant 2.4+
+- VirtualBox 7.0+
+
+### Install Vagrant and VirtualBox
+
+Install Vagrant and VirtualBox via Homebrew:
+
+```bash
+# Install Vagrant
+brew install vagrant
+
+# Install VirtualBox
+brew install --cask virtualbox
+
+# Verify installations
+vagrant --version
+vboxmanage --version
+```
+
+For detailed installation instructions and troubleshooting, see [HashiCorp's Vagrant Install Guide](https://developer.hashicorp.com/vagrant/install).
+
+**Note:** On macOS, you may need to:
+
+1. Approve VirtualBox in System Preferences → Security & Privacy if you see a kernel extension warning
+2. Reboot your machine after installing VirtualBox
+3. Add your user to the vboxusers group if you encounter permission issues
 
 ### Set Up Testing Environment
 
