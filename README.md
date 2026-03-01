@@ -52,59 +52,36 @@ ansible-playbook -i hosts local.yml
 
 ## Configuration
 
-Before running the playbook, customize the configuration files:
+Before running the playbook, customize the configuration:
 
 ### 1. Edit group_vars/local.yml
 
-Set your personal information:
+Configure the base role settings:
 
 ```yaml
-git_user_name: "Your Name"
-git_user_email: "your.email@example.com"
-ansible_pull_repo: "https://github.com/YOUR_USERNAME/mac-config.git"
+configure_system_settings: true
+create_config_directories: true
 ```
 
-### 2. Edit roles/dotfiles/files/
+### 2. Customize Base Role (Optional)
 
-Customize your dotfiles:
-
-- `zshrc` - Zsh shell configuration
-- `aliases.zsh` - Shell aliases
-- `gitconfig` - Git configuration
-
-### 3. Edit roles/homebrew/files/Brewfile
-
-Add or remove packages and casks as needed.
-
-### 4. Edit roles/vscode/defaults/main.yml
-
-Customize VS Code extensions and settings.
+Review and customize in `roles/base/defaults/main.yml` to:
+- Enable/disable system default configurations
+- Adjust which directories to create
 
 ## Running the Playbook
 
-### Run all roles
+### Run the base role
 
 ```bash
 ansible-playbook -i hosts local.yml
 ```
 
-### Run specific roles using tags
+### Run with tags
 
 ```bash
-# Only Homebrew
-ansible-playbook -i hosts local.yml --tags brew
-
-# Only dotfiles
-ansible-playbook -i hosts local.yml --tags dotfiles
-
-# Only VS Code
-ansible-playbook -i hosts local.yml --tags vscode
-
-# Only system settings
+# Only system configuration
 ansible-playbook -i hosts local.yml --tags system
-
-# Only launchd setup
-ansible-playbook -i hosts local.yml --tags launchd
 ```
 
 ### Dry run (check mode)
@@ -113,106 +90,71 @@ ansible-playbook -i hosts local.yml --tags launchd
 ansible-playbook -i hosts local.yml --check
 ```
 
-## Automatic Updates
+## Branch Structure
 
-The launchd role automatically sets up a service to run ansible-pull on login. This will:
+This repository uses feature branches to isolate and review each role:
 
-1. Check for changes in your git repository
-2. Update only if there are changes (`--only-if-changed` flag)
-3. Log output to `~/Library/Logs/ansible-pull.log`
+- **main** - Stable, production-ready configuration
+- **feature/base-role** - Base system configuration (current)
+- **feature/homebrew-role** - Package management (coming soon)
+- **feature/dotfiles-role** - Shell and git configuration (coming soon)
+- **feature/vscode-role** - VS Code setup (coming soon)
+- **feature/launchd-role** - Automatic updates scheduling (coming soon)
 
-### Manually run ansible-pull
-
-```bash
-ansible-pull --url https://github.com/YOUR_USERNAME/mac-config.git \
-  --directory ~/.ansible/mac-config \
-  --checkout main \
-  --inventory hosts \
-  --only-if-changed
-```
-
-### Check launchd service status
-
-```bash
-# List loaded services
-launchctl list | grep ansible
-
-# View logs
-tail -f ~/Library/Logs/ansible-pull.log
-
-# Unload service (if needed)
-launchctl unload ~/Library/LaunchAgents/com.user.ansible-pull.plist
-
-# Load service
-launchctl load ~/Library/LaunchAgents/com.user.ansible-pull.plist
-```
+Each feature branch contains a single role and corresponding Molecule tests. Once approved and tested, feature branches are merged to main.
 
 ## Directory Structure
 
 ```text
 mac-config/
-├── bootstrap.sh                # Quick setup script
-├── local.yml                   # Main playbook
+├── bootstrap.sh                # Quick setup script (production)
+├── local.yml                   # Main playbook (base-role)
 ├── hosts                       # Inventory file
 ├── ansible.cfg                 # Ansible configuration
+├── requirements.txt            # Python dependencies (testing)
+├── .ansible-lint               # Ansible linting config
+├── .yamllint                   # YAML linting config
 ├── collections/
 │   └── requirements.yml        # Galaxy collection requirements
 ├── roles/
-│   ├── base/                   # System defaults and directories
-│   ├── homebrew/               # Homebrew packages and casks
-│   ├── dotfiles/               # Shell and git configuration
-│   ├── vscode/                 # VS Code setup and extensions
-│   └── launchd/                # Auto-update scheduling
-└── group_vars/
-    └── local.yml               # Local machine variables
+│   └── base/                   # System defaults and directories
+│       └── molecule/           # Molecule test structure
+│           └── default/
+│               ├── molecule.yml
+│               ├── converge.yml
+│               └── verify.yml
+├── group_vars/
+│   └── local.yml               # Local machine variables
+└── .github/workflows/
+    └── molecule.yml            # GitHub Actions CI/CD workflow
 ```
 
-## Roles Explained
+## Base Role
 
-### base
+The base role (current) configures essential macOS system settings:
 
-Configures macOS system defaults:
+### What It Does
 
-- Directory creation (~/.config, ~/.local/bin, etc.)
-- Dock settings
-- Finder settings
-- Keyboard repeat rate
+- **Directory Creation**: Creates `~/.config` and `~/.local/bin` directories
+- **System Defaults**: Configures Finder to show hidden files and sets keyboard repeat rate
+- **Idempotency**: All tasks check current state before applying changes
 
-### homebrew
+### Verification
 
-Manages package installation:
+Molecule tests verify:
+- Required directories are created with correct permissions
+- Finder hidden files setting is applied
+- Keyboard repeat rate is configured
+- All tasks are idempotent (safe to run multiple times)
 
-- Installs Homebrew if not present
-- Runs `brew bundle` with Brewfile
-- Installs additional packages via Ansible
-- Provides outdated packages list
+### Upcoming Roles
 
-### dotfiles
+Future feature branches will add:
 
-Manages configuration files:
-
-- zsh configuration with zimfw
-- Git configuration
-- Shell aliases
-- Sets zsh as default shell
-
-### vscode
-
-Configures VS Code:
-
-- Creates user settings directory
-- Templates settings.json
-- Installs extensions
-- Supports idempotent installations
-
-### launchd
-
-Sets up automatic updates:
-
-- Creates LaunchAgent plist
-- Runs ansible-pull on login
-- Configures logging
-- Runs every 24 hours
+- **homebrew** - Package and cask installation via Homebrew
+- **dotfiles** - Shell configuration with zimfw and git setup
+- **vscode** - VS Code extensions and configuration
+- **launchd** - Automatic ansible-pull scheduling on login
 
 ## Troubleshooting
 
@@ -337,11 +279,10 @@ ansible-playbook -i hosts local.yml
 ansible-playbook -i hosts local.yml  # Should show no changes
 ```
 
-#### 4. Test individual roles
+#### 4. Test the base role
 
 ```bash
-ansible-playbook -i hosts local.yml --tags base --check
-ansible-playbook -i hosts local.yml --tags homebrew --check
+ansible-playbook -i hosts local.yml --tags system --check
 ```
 
 ### CI/CD Testing
