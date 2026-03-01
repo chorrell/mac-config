@@ -10,3 +10,15 @@ repos:
         language: node
         types: [markdown]
         additional_dependencies: ['markdownlint-cli2@0.20.0']
+
+  - repo: local
+    hooks:
+      - id: ansible-lint
+        name: ansible-lint
+        description: Run ansible-lint on Ansible playbooks and roles
+        entry: bash -c 'if command -v ansible-lint &> /dev/null; then ansible-lint; fi'
+        language: system
+        types: [yaml]
+        files: ^(roles|.*\.ya?ml)
+        pass_filenames: false
+        always_run: true
