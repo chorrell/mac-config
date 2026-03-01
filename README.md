@@ -202,35 +202,8 @@ brew doctor
 ### Testing Prerequisites
 
 - Python 3.11+
-- Vagrant 2.4+
-- VirtualBox 7.0+
 
-### Install Vagrant and VirtualBox
-
-Install Vagrant and VirtualBox via Homebrew:
-
-```bash
-# Add HashiCorp tap (for official Vagrant releases)
-brew tap hashicorp/tap
-
-# Install Vagrant
-brew install hashicorp/tap/vagrant
-
-# Install VirtualBox
-brew install --cask virtualbox
-
-# Verify installations
-vagrant --version
-vboxmanage --version
-```
-
-For detailed installation instructions and troubleshooting, see [HashiCorp's Vagrant Install Guide](https://developer.hashicorp.com/vagrant/install).
-
-**Note:** On macOS, you may need to:
-
-1. Approve VirtualBox in System Preferences → Security & Privacy if you see a kernel extension warning
-2. Reboot your machine after installing VirtualBox
-3. Add your user to the vboxusers group if you encounter permission issues
+**Note:** Molecule tests run directly on your macOS system (no VM needed), so all required dependencies are automatically available.
 
 ### Set Up Testing Environment
 
@@ -269,76 +242,74 @@ ansible-galaxy collection install -r collections/requirements.yml
 Then run the tests:
 
 ```bash
-# Full test cycle for base role (create → converge → verify → destroy)
+# Full test cycle for base role (syntax → converge → idempotence → verify)
 cd roles/base
 molecule test
 
 # Or run individual steps:
-molecule create      # Create macOS test VM
-molecule converge    # Apply the role to the VM
-molecule verify      # Run verification tests
-molecule destroy     # Clean up the VM
+molecule syntax    # Check playbook syntax
+molecule converge  # Apply the role to localhost
+molecule idempotence # Verify role is idempotent (run twice)
+molecule verify    # Run verification tests
 
 # Useful for debugging:
-molecule converge --no-cleanup  # Keep VM running after convergence
-molecule login       # SSH into running test VM
+molecule converge  # Run once without idempotence check
+molecule converge --extra-vars "debug=true"  # Add debugging
 ```
 
 **Expected Output:**
 
 ```bash
- --> Test matrix
-
- --> ubuntu Instance is being created...
- --> Lint Passed
- --> Preparing Instance
- --> Converging Instance
- --> Idempotence check
- --> Verifying Instance
- --> Cleaning Up Instance
-Verifying
- --> Running Ansible Verify playbook.
-
-PLAY [Verify] *****
-...
+INFO     default ➜ discovery: scenario test matrix: dependency, cleanup, destroy, syntax, create, prepare, converge, idempotence, side_effect, verify, cleanup, destroy
+INFO     default ➜ syntax: Executed: Successful
+INFO     default ➜ converge: Executed: Successful
+INFO     default ➜ idempotence: Executed: Successful
+INFO     default ➜ verify: Executed: Successful
 ```
 
 ### Troubleshooting Molecule Tests
 
-**VirtualBox/Vagrant Issues:**
+**Molecule not found:**
 
 ```bash
-# Check Vagrant status
-vagrant global-status
+# Ensure virtual environment is activated
+source venv/bin/activate
 
-# Destroy orphaned VMs if needed
-vagrant destroy -f
-
-# Verify VirtualBox is running
-vboxmanage list vms
+# Verify molecule is installed
+pip list | grep molecule
 ```
 
-**Python/Dependency Issues:**
+**"Role not found" errors:**
+
+This is handled automatically via a symlink in `roles/base/molecule/default/roles`.
+
+**Ansible or collection errors:**
 
 ```bash
 # Reinstall dependencies
 pip install --upgrade -r requirements.txt
 
-# Clear Molecule cache
+# Reinstall collections
+ansible-galaxy collection install -r collections/requirements.yml
+```
+
+**Cache issues:**
+
+```bash
+# Clear Molecule scenario cache
+cd roles/base
+molecule destroy
 rm -rf .molecule/
 ```
 
-**Slow Tests:**
+**Tests modify system configuration:**
 
-Molecule tests can take several minutes on first run as it:
+Since tests run on your actual macOS system, some system defaults will be modified:
 
-1. Creates a macOS virtual machine
-2. Installs Ansible
-3. Applies the role
-4. Runs verification tasks
-5. Cleans up the VM
+- Finder will show hidden files
+- Keyboard repeat rate will be set
 
-Subsequent runs will be faster due to caching.
+These can be reverted manually or by running the test again with `--check` mode.
 
 ### Run Linting Only
 
