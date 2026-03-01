@@ -6,6 +6,7 @@ on:
     paths:
       - 'roles/**'
       - 'molecule/**'
+      - 'local.yml'
       - '.github/workflows/molecule.yml'
       - '.ansible-lint'
       - '.yamllint'
@@ -38,14 +39,10 @@ jobs:
       - name: Run ansible-lint
         run: ansible-lint
 
-  test:
-    name: Test Role - ${{ matrix.role }}
+  test-playbook:
+    name: Test Complete Playbook
     runs-on: macos-latest
     needs: lint
-    strategy:
-      matrix:
-        role:
-          - base
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -61,21 +58,13 @@ jobs:
           path: ~/Library/Caches/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
 
-      - name: Install Vagrant
-        run: brew install --cask vagrant
-
-      - name: Install VirtualBox (Vagrant provider)
-        run: brew install --cask virtualbox
-
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
           ansible-galaxy collection install -r collections/requirements.yml
 
-      - name: Run Molecule tests
-        run: |
-          cd roles/${{ matrix.role }}
-          molecule test
+      - name: Run Molecule tests (playbook)
+        run: molecule test
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
