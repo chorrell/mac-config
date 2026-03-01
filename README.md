@@ -331,7 +331,12 @@ markdownlint-cli2 "**/*.md"   # Check Markdown (requires Docker)
 
 ### Pre-commit Hooks
 
-To automatically run markdownlint before commits:
+Pre-commit hooks automatically validate code before commits. This repo includes:
+
+- **markdownlint**: Validates markdown formatting
+- **ansible-lint**: Validates Ansible YAML and best practices
+
+To set up pre-commit hooks:
 
 ```bash
 # Install pre-commit framework
@@ -340,11 +345,13 @@ pip install pre-commit
 # Install git hooks in your repo
 pre-commit install
 
-# Run hooks on all files
+# Run hooks on all files (optional)
 pre-commit run --all-files
 
 # Hooks will now run automatically on `git commit`
 ```
+
+**Note:** The ansible-lint hook uses your system's ansible-lint installation (from Homebrew or venv), ensuring consistency with your testing environment.
 
 ### Deactivate Virtual Environment
 
