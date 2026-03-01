@@ -59,3 +59,7 @@ roles/**/molecule/**/.vagrant/
 
 # Pre-commit
 .pre-commit-framework/
+
+# Molecule role discovery symlinks
+# These symlinks allow Molecule to find roles for testing
+!roles/*/molecule/*/roles
