@@ -1,0 +1,11 @@
+---
+skip_list:
+  - meta-no-info
+  - role-name
+  - command-instead-of-shell
+  - var-naming
+
+exclude_paths:
+  - .github/
+  - molecule/
+  - .cache/

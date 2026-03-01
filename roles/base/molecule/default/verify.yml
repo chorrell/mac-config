@@ -1,0 +1,28 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Check .config directory exists
+      ansible.builtin.stat:
+        path: "{{ ansible_user_dir }}/.config"
+      register: config_dir
+      failed_when: not config_dir.stat.exists or not config_dir.stat.isdir
+
+    - name: Check .local/bin directory exists
+      ansible.builtin.stat:
+        path: "{{ ansible_user_dir }}/.local/bin"
+      register: local_bin_dir
+      failed_when: not local_bin_dir.stat.exists or not local_bin_dir.stat.isdir
+
+    - name: Verify Finder shows hidden files
+      ansible.builtin.shell: defaults read com.apple.finder AppleShowAllFiles
+      register: finder_setting
+      changed_when: false
+      failed_when: finder_setting.stdout != "1"
+
+    - name: Verify key repeat rate
+      ansible.builtin.shell: defaults read NSGlobalDomain KeyRepeat
+      register: key_repeat
+      changed_when: false
+      failed_when: key_repeat.stdout != "2"

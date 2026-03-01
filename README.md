@@ -253,21 +253,56 @@ brew update
 brew doctor
 ```
 
-## Testing Your Configuration
+## Testing
 
-### 1. Syntax validation
+### Testing Prerequisites
+
+- Python 3.11+
+- Vagrant
+- VirtualBox
+
+### Install Testing Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### Run Molecule Tests for a Role
+
+```bash
+# Test base role
+cd roles/base
+molecule test
+
+# Run individual steps
+molecule create      # Create test VM
+molecule converge    # Apply role
+molecule verify      # Run verification
+molecule destroy     # Clean up
+```
+
+### Run Linting Only
+
+```bash
+yamllint .
+ansible-lint
+```
+
+### Manual Configuration Testing
+
+#### 1. Syntax validation
 
 ```bash
 ansible-playbook -i hosts local.yml --syntax-check
 ```
 
-### 2. Check mode (dry run)
+#### 2. Check mode (dry run)
 
 ```bash
 ansible-playbook -i hosts local.yml --check
 ```
 
-### 3. Idempotency test
+#### 3. Idempotency test
 
 Run twice and verify no changes on second run:
 
@@ -276,12 +311,21 @@ ansible-playbook -i hosts local.yml
 ansible-playbook -i hosts local.yml  # Should show no changes
 ```
 
-### 4. Test individual roles
+#### 4. Test individual roles
 
 ```bash
 ansible-playbook -i hosts local.yml --tags base --check
 ansible-playbook -i hosts local.yml --tags homebrew --check
 ```
+
+### CI/CD Testing
+
+Molecule tests run automatically on:
+- Pull requests to feature branches
+- Pushes to main branch
+- Changes to roles, workflows, or linting configs
+
+See `.github/workflows/molecule.yml` for details.
 
 ## Best Practices Implemented
 
