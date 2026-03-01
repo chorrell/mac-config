@@ -242,18 +242,17 @@ ansible-galaxy collection install -r collections/requirements.yml
 Then run the tests:
 
 ```bash
-# Full test cycle for base role (syntax → converge → idempotence → verify)
-cd roles/base
+# Full test cycle for complete playbook (syntax → converge → idempotence → verify)
 molecule test
 
 # Or run individual steps:
 molecule syntax    # Check playbook syntax
-molecule converge  # Apply the role to localhost
-molecule idempotence # Verify role is idempotent (run twice)
+molecule converge  # Apply the playbook to localhost
+molecule idempotence # Verify idempotency (converge twice)
 molecule verify    # Run verification tests
 
 # Useful for debugging:
-molecule converge  # Run once without idempotence check
+molecule converge  # Run playbook once
 molecule converge --extra-vars "debug=true"  # Add debugging
 ```
 
@@ -279,10 +278,6 @@ source venv/bin/activate
 pip list | grep molecule
 ```
 
-**"Role not found" errors:**
-
-This is handled automatically via a symlink in `roles/base/molecule/default/roles`.
-
 **Ansible or collection errors:**
 
 ```bash
@@ -297,7 +292,6 @@ ansible-galaxy collection install -r collections/requirements.yml
 
 ```bash
 # Clear Molecule scenario cache
-cd roles/base
 molecule destroy
 rm -rf .molecule/
 ```

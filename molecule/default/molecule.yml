@@ -2,7 +2,7 @@
 dependency:
   name: galaxy
   options:
-    requirements-file: ../../../../collections/requirements.yml
+    requirements-file: ../../collections/requirements.yml
 
 driver:
   name: default
@@ -16,10 +16,12 @@ provisioner:
     defaults:
       callbacks_enabled: profile_tasks,timer
   inventory:
-    host_vars:
-      localhost:
-        ansible_connection: local
-        ansible_python_interpreter: /usr/bin/python3
+    hosts:
+      local:
+        hosts:
+          localhost:
+            ansible_connection: local
+            ansible_python_interpreter: /usr/bin/python3
 
 verifier:
   name: ansible

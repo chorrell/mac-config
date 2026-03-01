@@ -1,0 +1,26 @@
+---
+- name: Verify playbook execution
+  hosts: local
+  connection: local
+  gather_facts: true
+  tasks:
+    - name: Verify base role directories
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: base_dirs
+      failed_when: not base_dirs.stat.exists or not base_dirs.stat.isdir
+      loop:
+        - "{{ ansible_user_dir }}/.config"
+        - "{{ ansible_user_dir }}/.local/bin"
+
+    - name: Verify Finder configuration
+      ansible.builtin.shell: defaults read com.apple.finder AppleShowAllFiles
+      register: finder_hidden
+      changed_when: false
+      failed_when: finder_hidden.stdout != "1"
+
+    - name: Verify keyboard settings
+      ansible.builtin.shell: defaults read NSGlobalDomain KeyRepeat
+      register: key_repeat
+      changed_when: false
+      failed_when: key_repeat.stdout != "2"
