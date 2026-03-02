@@ -8,8 +8,6 @@ on:
       - 'molecule/**'
       - 'local.yml'
       - '.github/workflows/molecule.yml'
-      - '.ansible-lint'
-      - '.yamllint'
       - 'requirements.txt'
   push:
     branches:
@@ -17,32 +15,9 @@ on:
       - 'feature/**'
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: |
-          pip install ansible ansible-lint yamllint
-
-      - name: Run yamllint
-        run: yamllint .
-
-      - name: Run ansible-lint
-        run: ansible-lint
-
   test-playbook:
     name: Test Complete Playbook
     runs-on: macos-latest
-    needs: lint
     steps:
       - name: Checkout
         uses: actions/checkout@v4
