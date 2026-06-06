@@ -1,7 +1,13 @@
-name: markdownlint 
+---
+name: markdownlint
 
 on:
   pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
 
 jobs:
   markdownlint:
@@ -9,8 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
-      - name: Run markdownlint
-        uses: DavidAnson/markdownlint-cli2-action@v22
+        uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0  # v6.0.3
         with:
-            globs: "**/*.md"
+          persist-credentials: false
+      - name: Run markdownlint
+        uses: DavidAnson/markdownlint-cli2-action@fa0cd0f1a052f54da593c83860f2292982f5d142  # v23.2.0
+        with:
+          globs: "**/*.md"
