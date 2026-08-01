@@ -4,10 +4,11 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:30"
-      timezone: "America/Toronto"
+      interval: "monthly"
+    groups:
+      monthly-batch:
+        patterns:
+          - "*"
     pull-request-branch-name:
       separator: "/"
     commit-message:
