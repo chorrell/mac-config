@@ -11,7 +11,7 @@ repos:
       - id: gitleaks
 
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.22.1
+    rev: v0.23.1
     hooks:
       - id: markdownlint-cli2-docker
 
@@ -31,10 +31,10 @@ repos:
       - id: yamllint
 
   - repo: https://github.com/ansible/ansible-lint
-    rev: v26.4.0
+    rev: v26.6.0
     hooks:
       - id: ansible-lint
   - repo: https://github.com/woodruffw/zizmor-pre-commit
-    rev: v1.25.2
+    rev: v1.28.0
     hooks:
       - id: zizmor
