@@ -79,19 +79,17 @@ Before running the playbook, customize the configuration:
 
 ### 1. Edit group_vars/local.yml
 
-Configure the base role settings:
+Override any role defaults for your machine here. For example, to change which directories the base role creates:
 
 ```yaml
-configure_system_settings: true
-create_config_directories: true
+config_dirs:
+  - "{{ ansible_user_dir }}/.config"
+  - "{{ ansible_user_dir }}/.local/bin"
 ```
 
 ### 2. Customize Base Role (Optional)
 
-Review and customize in `roles/base/defaults/main.yml` to:
-
-- Enable/disable system default configurations
-- Adjust which directories to create
+Review the defaults in `roles/base/defaults/main.yml`, including `config_dirs` (the directories to create).
 
 ## Running the Playbook
 
@@ -143,7 +141,7 @@ mac-config/
 ├── collections/
 │   └── requirements.yml        # Galaxy collection requirements
 ├── roles/
-│   └── base/                   # System defaults and directories
+│   └── base/                   # Base directories
 │       └── molecule/           # Molecule test structure
 │           └── default/
 │               ├── molecule.yml
@@ -157,12 +155,11 @@ mac-config/
 
 ## Base Role
 
-The base role (current) configures essential macOS system settings:
+The base role (current) sets up the essential base directories:
 
 ### What It Does
 
 - **Directory Creation**: Creates `~/.config` and `~/.local/bin` directories
-- **System Defaults**: Sets keyboard repeat rate
 - **Idempotency**: All tasks check current state before applying changes
 
 ### Verification
@@ -170,7 +167,6 @@ The base role (current) configures essential macOS system settings:
 Molecule tests verify:
 
 - Required directories are created with correct permissions
-- Keyboard repeat rate is configured
 - All tasks are idempotent (safe to run multiple times)
 
 ### Upcoming Roles
@@ -181,6 +177,7 @@ Future feature branches will add:
 - **dotfiles** - Shell configuration with zimfw and git setup
 - **vscode** - VS Code extensions and configuration
 - **launchd** - Automatic ansible-pull scheduling on login
+- **macos-defaults** - macOS system defaults such as keyboard repeat rate (under consideration)
 
 ## Troubleshooting
 
@@ -304,14 +301,6 @@ uv run ansible-galaxy collection install -r collections/requirements.yml
 uv run molecule destroy
 rm -rf .molecule/
 ```
-
-**Tests modify system configuration:**
-
-Since tests run on your actual macOS system, some system defaults will be modified:
-
-- Keyboard repeat rate will be set
-
-These can be reverted manually or by running the test again with `--check` mode.
 
 ### Run Linting Only
 

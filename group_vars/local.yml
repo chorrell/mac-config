@@ -1,7 +1,3 @@
 ---
 # Group variables for local machine
 # Override role defaults here
-
-# Base role settings
-configure_system_settings: true
-create_config_directories: true

@@ -12,9 +12,3 @@
       loop:
         - "{{ ansible_user_dir }}/.config"
         - "{{ ansible_user_dir }}/.local/bin"
-
-    - name: Verify keyboard settings
-      ansible.builtin.shell: defaults read NSGlobalDomain KeyRepeat
-      register: key_repeat
-      changed_when: false
-      failed_when: key_repeat.stdout != "2"
