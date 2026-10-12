@@ -10,8 +10,8 @@
       register: base_dirs
       failed_when: not base_dirs.stat.exists or not base_dirs.stat.isdir
       loop:
-        - "{{ ansible_user_dir }}/.config"
-        - "{{ ansible_user_dir }}/.local/bin"
+        - "{{ ansible_facts['user_dir'] }}/.config"
+        - "{{ ansible_facts['user_dir'] }}/.local/bin"
 
     - name: Verify keyboard settings
       ansible.builtin.shell: defaults read NSGlobalDomain KeyRepeat

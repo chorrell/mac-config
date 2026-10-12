@@ -8,7 +8,7 @@
   pre_tasks:
     - name: Ensure Python interpreter is available
       ansible.builtin.debug:
-        msg: "Running with Python {{ ansible_python_version }}"
+        msg: "Running with Python {{ ansible_facts['python_version'] }}"
 
   roles:
     - role: base
