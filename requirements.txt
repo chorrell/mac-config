@@ -1,0 +1,4 @@
+molecule>=6.0
+ansible-core>=2.15
+ansible-lint>=6.0
+yamllint>=1.33

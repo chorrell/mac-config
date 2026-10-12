@@ -1,0 +1,20 @@
+---
+- name: Configure macOS base system
+  hosts: local
+  connection: local
+  become: false
+  gather_facts: true
+
+  pre_tasks:
+    - name: Ensure Python interpreter is available
+      ansible.builtin.debug:
+        msg: "Running with Python {{ ansible_python_version }}"
+
+  roles:
+    - role: base
+      tags: ['system']
+
+  post_tasks:
+    - name: Base system configuration complete
+      ansible.builtin.debug:
+        msg: "macOS base system configuration complete!"
