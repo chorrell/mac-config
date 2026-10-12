@@ -2,7 +2,7 @@
 dependency:
   name: galaxy
   options:
-    requirements-file: ../../collections/requirements.yml
+    requirements-file: ${MOLECULE_PROJECT_DIRECTORY}/collections/requirements.yml
 
 driver:
   name: default
@@ -14,7 +14,7 @@ provisioner:
   name: ansible
   config_options:
     defaults:
-      callbacks_enabled: profile_tasks,timer
+      inject_facts_as_vars: false
   inventory:
     hosts:
       local:
@@ -25,6 +25,16 @@ provisioner:
 
 verifier:
   name: ansible
+
+# Tests run directly against localhost, so there is nothing to create,
+# prepare or destroy. Collections are installed before running Molecule
+# (see README and CI), so the dependency step is skipped as well.
+scenario:
+  test_sequence:
+    - syntax
+    - converge
+    - idempotence
+    - verify
 
 lint: |
   set -e
