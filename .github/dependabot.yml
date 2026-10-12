@@ -33,3 +33,19 @@ updates:
       include: "scope"
     cooldown:
       default-days: 7
+
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      monthly-batch:
+        patterns:
+          - "*"
+    pull-request-branch-name:
+      separator: "/"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    cooldown:
+      default-days: 7
