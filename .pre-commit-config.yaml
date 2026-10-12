@@ -1,5 +1,10 @@
 ---
 repos:
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.12.21
+    hooks:
+      - id: uv-lock
+
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.12
     hooks:
@@ -25,15 +30,22 @@ repos:
       - id: check-added-large-files
       - id: mixed-line-ending
 
-  - repo: https://github.com/adrienverge/yamllint
-    rev: v1.38.0
+  # Run yamllint and ansible-lint from the uv environment so the hooks use
+  # the same versions pinned in uv.lock as local runs and CI.
+  - repo: local
     hooks:
       - id: yamllint
-
-  - repo: https://github.com/ansible/ansible-lint
-    rev: v26.9.0
-    hooks:
+        name: yamllint
+        entry: uv run --frozen yamllint
+        language: system
+        types: [yaml]
       - id: ansible-lint
+        name: ansible-lint
+        entry: uv run --frozen ansible-lint
+        language: system
+        pass_filenames: false
+        always_run: true
+
   - repo: https://github.com/woodruffw/zizmor-pre-commit
     rev: v1.30.1
     hooks:

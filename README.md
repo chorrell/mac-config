@@ -27,10 +27,11 @@ cd mac-config
 The bootstrap script will:
 
 1. Install Homebrew (if not present)
-2. Install Ansible
-3. Install Ansible Galaxy collections
-4. Validate the playbook syntax
-5. Run the Ansible playbook
+2. Install [uv](https://docs.astral.sh/uv/) (if not present)
+3. Install a uv-managed Python 3.14 and Ansible into `.venv`
+4. Install Ansible Galaxy collections
+5. Validate the playbook syntax
+6. Run the Ansible playbook
 
 ### Option 2: Manual Setup
 
@@ -40,14 +41,36 @@ If you prefer to do this step by step:
 # Install Homebrew if needed
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# Install Ansible
-brew install ansible
+# Install uv
+brew install uv
+
+# Install Python 3.14 and Ansible into .venv (from uv.lock)
+uv sync --no-dev
 
 # Install Ansible Galaxy collections
-ansible-galaxy collection install -r collections/requirements.yml
+uv run --no-dev ansible-galaxy collection install -r collections/requirements.yml
 
 # Run the playbook
-ansible-playbook -i hosts local.yml
+uv run --no-dev ansible-playbook -i hosts local.yml
+```
+
+## Python and Ansible Environment
+
+Ansible and its Python dependencies are managed with [uv](https://docs.astral.sh/uv/) and are never installed into the system Python:
+
+- `.python-version` pins Python **3.14**, the newest version supported by ansible-core 2.21.
+- `pyproject.toml` declares the dependencies (`ansible-core` at runtime; Molecule, ansible-lint, yamllint and pre-commit in the `dev` group).
+- `uv.lock` pins exact versions so every machine and CI run gets the same environment.
+- `[tool.uv] python-preference = "only-managed"` makes uv download its own Python and ignore the system or Homebrew one.
+- The inventory sets `ansible_python_interpreter` to `{{ ansible_playbook_python }}`, so modules also run under the uv-managed Python.
+
+Run Ansible commands with `uv run` (for example, `uv run ansible-playbook local.yml`), or activate the environment with `source .venv/bin/activate`.
+
+To update dependencies:
+
+```bash
+uv lock --upgrade   # Upgrade everything within the constraints in pyproject.toml
+uv sync             # Apply the updated lock file
 ```
 
 ## Configuration
@@ -75,20 +98,20 @@ Review and customize in `roles/base/defaults/main.yml` to:
 ### Run the base role
 
 ```bash
-ansible-playbook -i hosts local.yml
+uv run ansible-playbook -i hosts local.yml
 ```
 
 ### Run with tags
 
 ```bash
 # Only system configuration
-ansible-playbook -i hosts local.yml --tags system
+uv run ansible-playbook -i hosts local.yml --tags system
 ```
 
 ### Dry run (check mode)
 
 ```bash
-ansible-playbook -i hosts local.yml --check
+uv run ansible-playbook -i hosts local.yml --check
 ```
 
 ## Branch Structure
@@ -112,7 +135,9 @@ mac-config/
 ├── local.yml                   # Main playbook (base-role)
 ├── hosts                       # Inventory file
 ├── ansible.cfg                 # Ansible configuration
-├── requirements.txt            # Python dependencies (testing)
+├── pyproject.toml              # Python dependencies (managed by uv)
+├── uv.lock                     # Locked dependency versions
+├── .python-version             # Python version used by uv
 ├── .ansible-lint               # Ansible linting config
 ├── .yamllint                   # YAML linting config
 ├── collections/
@@ -161,8 +186,11 @@ Future feature branches will add:
 
 ### Ansible not found
 
+Ansible lives in the project's `.venv`, not on your `PATH`. Install it and run it through uv:
+
 ```bash
-brew install ansible
+uv sync
+uv run ansible --version
 ```
 
 ### Permission denied for zsh
@@ -200,59 +228,41 @@ brew doctor
 
 ### Testing Prerequisites
 
-- Python 3.11+
+- [uv](https://docs.astral.sh/uv/) (`brew install uv`); it installs Python 3.14 for you
 
 **Note:** Molecule tests run directly on your macOS system (no VM needed), so all required dependencies are automatically available.
 
 ### Set Up Testing Environment
 
-For local testing, create a Python virtual environment to isolate testing dependencies:
+Install Ansible plus the testing and linting tools (the `dev` dependency group) into `.venv`:
 
 ```bash
-# Create virtual environment
-python3 -m venv venv
-
-# Activate virtual environment
-source venv/bin/activate
-
-# Install testing dependencies
-pip install -r requirements.txt
+# Install Python 3.14 and all dependencies, including dev tools
+uv sync
 
 # Install Galaxy collections
-ansible-galaxy collection install -r collections/requirements.yml
+uv run ansible-galaxy collection install -r collections/requirements.yml
 ```
 
-**Note:** Ansible will be installed in the virtual environment alongside Molecule and linting tools. For production/bootstrap, Ansible is installed via Homebrew instead (see `bootstrap.sh`).
+**Note:** `bootstrap.sh` runs `uv sync --no-dev`, which installs only Ansible. Plain `uv sync` also installs Molecule and the linters.
 
 ### Run Molecule Tests for a Role
 
-First, ensure your testing environment is set up:
-
-```bash
-# Create and activate virtual environment (if not already done)
-python3 -m venv venv
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-ansible-galaxy collection install -r collections/requirements.yml
-```
-
-Then run the tests:
+First, set up the testing environment as described above (`uv sync`), then run the tests:
 
 ```bash
 # Full test cycle for complete playbook (syntax → converge → idempotence → verify)
-molecule test
+uv run molecule test
 
 # Or run individual steps:
-molecule syntax    # Check playbook syntax
-molecule converge  # Apply the playbook to localhost
-molecule idempotence # Verify idempotency (converge twice)
-molecule verify    # Run verification tests
+uv run molecule syntax    # Check playbook syntax
+uv run molecule converge  # Apply the playbook to localhost
+uv run molecule idempotence # Verify idempotency (converge twice)
+uv run molecule verify    # Run verification tests
 
 # Useful for debugging:
-molecule converge  # Run playbook once
-molecule converge --extra-vars "debug=true"  # Add debugging
+uv run molecule converge  # Run playbook once
+uv run molecule converge --extra-vars "debug=true"  # Add debugging
 ```
 
 **Expected Output:**
@@ -270,28 +280,28 @@ INFO     default ➜ verify: Executed: Successful
 **Molecule not found:**
 
 ```bash
-# Ensure virtual environment is activated
-source venv/bin/activate
+# Install dev dependencies (a plain `uv sync` includes them)
+uv sync
 
 # Verify molecule is installed
-pip list | grep molecule
+uv run molecule --version
 ```
 
 **Ansible or collection errors:**
 
 ```bash
-# Reinstall dependencies
-pip install --upgrade -r requirements.txt
+# Recreate the environment from uv.lock
+uv sync --reinstall
 
 # Reinstall collections
-ansible-galaxy collection install -r collections/requirements.yml
+uv run ansible-galaxy collection install -r collections/requirements.yml
 ```
 
 **Cache issues:**
 
 ```bash
 # Clear Molecule scenario cache
-molecule destroy
+uv run molecule destroy
 rm -rf .molecule/
 ```
 
@@ -306,16 +316,13 @@ These can be reverted manually or by running the test again with `--check` mode.
 ### Run Linting Only
 
 ```bash
-# Ensure venv is activated
-source venv/bin/activate
-
 # Run all linting
-yamllint .
-ansible-lint
+uv run yamllint .
+uv run ansible-lint
 
 # Or run individually:
-yamllint roles/base/          # Check YAML syntax
-ansible-lint roles/base/      # Check Ansible best practices
+uv run yamllint roles/base/          # Check YAML syntax
+uv run ansible-lint roles/base/      # Check Ansible best practices
 markdownlint-cli2 "**/*.md"   # Check Markdown (requires Docker)
 ```
 
@@ -323,30 +330,21 @@ markdownlint-cli2 "**/*.md"   # Check Markdown (requires Docker)
 
 Pre-commit hooks automatically validate code before commits. This repo includes:
 
+- **uv-lock**: Keeps `uv.lock` in sync with `pyproject.toml`
 - **markdownlint**: Validates markdown formatting
-- **ansible-lint**: Validates Ansible YAML and best practices
+- **yamllint** and **ansible-lint**: Run via `uv run`, so they use the versions locked in `uv.lock`
 
 To set up pre-commit hooks:
 
 ```bash
-# Install pre-commit framework
-pip install pre-commit
-
+# pre-commit is installed by `uv sync` (dev group)
 # Install git hooks in your repo
-pre-commit install
+uv run pre-commit install
 
 # Run hooks on all files (optional)
-pre-commit run --all-files
+uv run pre-commit run --all-files
 
 # Hooks will now run automatically on `git commit`
-```
-
-**Note:** The ansible-lint hook uses your system's ansible-lint installation (from Homebrew or venv), ensuring consistency with your testing environment.
-
-### Deactivate Virtual Environment
-
-```bash
-deactivate
 ```
 
 ### Manual Configuration Testing
@@ -354,13 +352,13 @@ deactivate
 #### 1. Syntax validation
 
 ```bash
-ansible-playbook -i hosts local.yml --syntax-check
+uv run ansible-playbook -i hosts local.yml --syntax-check
 ```
 
 #### 2. Check mode (dry run)
 
 ```bash
-ansible-playbook -i hosts local.yml --check
+uv run ansible-playbook -i hosts local.yml --check
 ```
 
 #### 3. Idempotency test
@@ -368,14 +366,14 @@ ansible-playbook -i hosts local.yml --check
 Run twice and verify no changes on second run:
 
 ```bash
-ansible-playbook -i hosts local.yml
-ansible-playbook -i hosts local.yml  # Should show no changes
+uv run ansible-playbook -i hosts local.yml
+uv run ansible-playbook -i hosts local.yml  # Should show no changes
 ```
 
 #### 4. Test the base role
 
 ```bash
-ansible-playbook -i hosts local.yml --tags system --check
+uv run ansible-playbook -i hosts local.yml --tags system --check
 ```
 
 ### CI/CD Testing

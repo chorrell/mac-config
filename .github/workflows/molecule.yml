@@ -8,7 +8,9 @@ on:
       - 'molecule/**'
       - 'local.yml'
       - '.github/workflows/molecule.yml'
-      - 'requirements.txt'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.python-version'
   push:
     branches:
       - main
@@ -27,19 +29,18 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7  # v10.2.0
         with:
-          python-version: '3.14'
-          cache: "pip"
+          enable-cache: true
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
-          ansible-galaxy collection install -r collections/requirements.yml
+          uv sync --locked
+          uv run ansible-galaxy collection install -r collections/requirements.yml
 
       - name: Run Molecule tests (playbook)
-        run: molecule test
+        run: uv run molecule test
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
