@@ -1,7 +1,5 @@
 ---
 # Base role defaults
-configure_system_settings: true
-create_config_directories: true
 
 # Directory setup
 config_dirs:
