@@ -1,0 +1,45 @@
+---
+name: Molecule Testing
+
+on:
+  pull_request:
+    paths:
+      - 'roles/**'
+      - 'molecule/**'
+      - 'local.yml'
+      - '.github/workflows/molecule.yml'
+      - 'requirements.txt'
+  push:
+    branches:
+      - main
+      - 'feature/**'
+
+permissions:
+  contents: read
+
+jobs:
+  test-playbook:
+    name: Test Complete Playbook
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
+        with:
+          python-version: '3.14'
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          ansible-galaxy collection install -r collections/requirements.yml
+
+      - name: Run Molecule tests (playbook)
+        run: molecule test
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'

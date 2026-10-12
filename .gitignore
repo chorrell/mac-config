@@ -1,0 +1,65 @@
+# Ansible
+*.retry
+.ansible/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+
+# IDE and Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# Environment and local overrides
+.env
+.env.local
+group_vars/local.yml.local
+roles/dotfiles/files/zshrc.local
+roles/dotfiles/files/zimrc.local
+
+# Backups and temporary files
+*.bak
+*.backup
+*.tmp
+.cache/
+
+# Sensitive files
+**/ssh/*
+!**/ssh/.gitkeep
+**/credentials*
+**/secrets*
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Logs
+*.log
+logs/
+
+# Molecule
+.molecule/
+.cache/
+molecule/**/.vagrant/
+roles/**/molecule/**/.vagrant/
+
+# Pre-commit
+.pre-commit-framework/
+
+# Molecule role discovery symlinks
+# These symlinks allow Molecule to find roles for testing
+!roles/*/molecule/*/roles
