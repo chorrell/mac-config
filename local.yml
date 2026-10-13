@@ -1,5 +1,5 @@
 ---
-- name: Configure macOS base system
+- name: Configure macOS
   hosts: local
   connection: local
   become: false
@@ -13,8 +13,10 @@
   roles:
     - role: base
       tags: ['system']
+    - role: homebrew
+      tags: ['packages', 'brew']
 
   post_tasks:
-    - name: Base system configuration complete
+    - name: Configuration complete
       ansible.builtin.debug:
-        msg: "macOS base system configuration complete!"
+        msg: "macOS configuration complete!"

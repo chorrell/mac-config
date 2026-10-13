@@ -118,7 +118,7 @@ This repository uses feature branches to isolate and review each role:
 
 - **main** - Stable, production-ready configuration
 - **feature/base-role** - Base system configuration (current)
-- **feature/homebrew-role** - Package management (coming soon)
+- **feature/homebrew-role** - Package management
 - **feature/dotfiles-role** - Shell and git configuration (coming soon)
 - **feature/vscode-role** - VS Code setup (coming soon)
 - **feature/launchd-role** - Automatic updates scheduling (coming soon)
@@ -141,7 +141,8 @@ mac-config/
 ├── collections/
 │   └── requirements.yml        # Galaxy collection requirements
 ├── roles/
-│   └── base/                   # Base directories
+│   ├── base/                   # Base directories
+│   └── homebrew/               # Homebrew taps, formulae and casks
 │       └── molecule/           # Molecule test structure
 │           └── default/
 │               ├── molecule.yml
@@ -169,11 +170,28 @@ Molecule tests verify:
 - Required directories are created with correct permissions
 - All tasks are idempotent (safe to run multiple times)
 
+## Homebrew Role
+
+The homebrew role installs the development and DevOps toolset. Homebrew itself is installed by `bootstrap.sh` before Ansible runs; the role fails early with a pointer to the script if `brew` is missing.
+
+### What It Installs
+
+- **Taps**: Adds the third-party taps in `homebrew_taps` and marks them trusted (Homebrew refuses to load formulae and casks from untrusted taps)
+- **Formulae**: Installs the command-line tools in `homebrew_formulae`
+- **Casks**: Installs the applications in `homebrew_casks`
+
+Packages are only ever installed, never upgraded or removed. Tools that come with their own configuration (such as Ghostty and fastfetch) are installed by their own roles rather than listed here.
+
+To change the toolset, edit the lists in `roles/homebrew/defaults/main.yml`, or override them in `group_vars/local.yml`. Run just this role with:
+
+```bash
+uv run ansible-playbook -i hosts local.yml --tags brew
+```
+
 ### Upcoming Roles
 
 Future feature branches will add:
 
-- **homebrew** - Package and cask installation via Homebrew
 - **dotfiles** - Shell configuration with zimfw and git setup
 - **vscode** - VS Code extensions and configuration
 - **launchd** - Automatic ansible-pull scheduling on login
@@ -392,7 +410,7 @@ To customize this for your needs:
 1. Fork this repository
 2. Update `group_vars/local.yml` with your preferences
 3. Customize dotfiles in `roles/dotfiles/files/`
-4. Add/remove packages in `roles/homebrew/files/Brewfile`
+4. Add/remove packages in `roles/homebrew/defaults/main.yml`
 5. Test with `ansible-playbook -i hosts local.yml --check`
 6. Commit your changes
 

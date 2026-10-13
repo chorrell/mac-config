@@ -1,0 +1,36 @@
+---
+- name: Check that Homebrew is installed
+  ansible.builtin.stat:
+    path: "{{ homebrew_prefix }}/bin/brew"
+  register: homebrew_brew
+
+- name: Fail if Homebrew is missing
+  ansible.builtin.assert:
+    that: homebrew_brew.stat.exists
+    fail_msg: >-
+      Homebrew was not found at {{ homebrew_prefix }}/bin/brew.
+      Run ./bootstrap.sh to install it first.
+    quiet: true
+
+# Homebrew refuses to load formulae and casks from untrusted third-party taps
+- name: Add and trust Homebrew taps
+  community.general.homebrew_tap:
+    name: "{{ homebrew_taps }}"
+    state: present
+    trust: true
+    path: "{{ homebrew_prefix }}/bin"
+  when: homebrew_taps | length > 0
+
+- name: Install Homebrew formulae
+  community.general.homebrew:
+    name: "{{ homebrew_formulae }}"
+    state: present
+    path: "{{ homebrew_prefix }}/bin"
+  when: homebrew_formulae | length > 0
+
+- name: Install Homebrew casks
+  community.general.homebrew_cask:
+    name: "{{ homebrew_casks }}"
+    state: present
+    path: "{{ homebrew_prefix }}/bin"
+  when: homebrew_casks | length > 0
