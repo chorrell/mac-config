@@ -1,25 +1,27 @@
 # Mac Configuration with Ansible
 
-Automated macOS laptop configuration using Ansible and ansible-pull. Set up a complete development environment with a single command, including:
+Ansible playbook that sets up a new Mac for development and DevOps work, based on the setup of my current Mac. Clone the repository and run one script to get:
 
-- Homebrew package management
-- Shell configuration (zsh with zimfw)
-- Git configuration
-- VS Code setup with extensions
-- Automatic updates via launchd
+- Homebrew and the command-line toolset (infrastructure as code, Kubernetes, linters and more)
+- The [Ghostty](https://ghostty.org/) terminal, with its config, theme and font
+- [fastfetch](https://github.com/fastfetch-cli/fastfetch) and its preset
+- zsh with [zimfw](https://zimfw.sh/), and [atuin](https://atuin.sh/) shell history
+- Shared git settings, Git LFS and GnuPG
+
+The playbook runs locally with `ansible-playbook` and is safe to run again: every role only changes what differs from the desired state.
 
 ## Prerequisites
 
-- macOS (10.15+)
-- Internet connection
-- Administrator access (for some tasks)
+- A Mac with Apple Silicon (Homebrew in `/opt/homebrew`)
+- Internet access
+- An administrator account, for installing Homebrew
 
 ## Quick Start
 
 ### Option 1: Bootstrap Script (Recommended)
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/mac-config.git
+git clone https://github.com/chorrell/mac-config.git
 cd mac-config
 ./bootstrap.sh
 ```
@@ -54,6 +56,14 @@ uv run --no-dev ansible-galaxy collection install -r collections/requirements.ym
 uv run --no-dev ansible-playbook -i hosts local.yml
 ```
 
+### After the First Run
+
+Some settings are personal or secret, so they are not in this repository. Set them by hand on each new Mac:
+
+- **git identity and signing**: see [Identity and Commit Signing](#identity-and-commit-signing)
+- **Machine-specific shell settings and secrets**: put them in `~/.zshrc.local` (see [Machine-specific Settings and Secrets](#machine-specific-settings-and-secrets))
+- **Shell history sync**: run `atuin login`
+
 ## Python and Ansible Environment
 
 Ansible and its Python dependencies are managed with [uv](https://docs.astral.sh/uv/) and are never installed into the system Python:
@@ -75,25 +85,19 @@ uv sync             # Apply the updated lock file
 
 ## Configuration
 
-Before running the playbook, customize the configuration:
-
-### 1. Edit group_vars/local.yml
-
-Override any role defaults for your machine here. For example, to change which directories the base role creates:
+Each role's settings live in its `defaults/main.yml`, and its config files in its `files/` directory. To change what gets installed or configured, edit those, or override role defaults for this machine in `group_vars/local.yml`. For example, to change which directories the base role creates:
 
 ```yaml
 config_dirs:
-  - "{{ ansible_user_dir }}/.config"
-  - "{{ ansible_user_dir }}/.local/bin"
+  - "{{ ansible_facts['user_dir'] }}/.config"
+  - "{{ ansible_facts['user_dir'] }}/.local/bin"
 ```
 
-### 2. Customize Base Role (Optional)
-
-Review the defaults in `roles/base/defaults/main.yml`, including `config_dirs` (the directories to create).
+Facts are only available as `ansible_facts[...]` (`inject_facts_as_vars` is off in `ansible.cfg`), so use `ansible_facts['user_dir']` rather than `ansible_user_dir`.
 
 ## Running the Playbook
 
-### Run the base role
+### Run everything
 
 ```bash
 uv run ansible-playbook -i hosts local.yml
@@ -101,45 +105,47 @@ uv run ansible-playbook -i hosts local.yml
 
 ### Run with tags
 
+Each role has a tag, so you can apply one part at a time:
+
+| Tag | Roles |
+| --- | --- |
+| `system` | base |
+| `brew` | homebrew |
+| `ghostty` | ghostty |
+| `fastfetch` | fastfetch |
+| `shell` | atuin and zsh (or `atuin`, `zsh` on their own) |
+| `git` | git |
+
 ```bash
-# Only system configuration
-uv run ansible-playbook -i hosts local.yml --tags system
+uv run ansible-playbook -i hosts local.yml --tags ghostty
 ```
 
 ### Dry run (check mode)
 
+Show what would change, with diffs, without changing anything:
+
 ```bash
-uv run ansible-playbook -i hosts local.yml --check
+uv run ansible-playbook -i hosts local.yml --check --diff
 ```
-
-## Branch Structure
-
-This repository uses feature branches to isolate and review each role:
-
-- **main** - Stable, production-ready configuration
-- **feature/base-role** - Base system configuration (current)
-- **feature/homebrew-role** - Package management
-- **feature/dotfiles-role** - Shell and git configuration (coming soon)
-- **feature/vscode-role** - VS Code setup (coming soon)
-- **feature/launchd-role** - Automatic updates scheduling (coming soon)
-
-Each feature branch contains a single role and corresponding Molecule tests. Once approved and tested, feature branches are merged to main.
 
 ## Directory Structure
 
 ```text
 mac-config/
-├── bootstrap.sh                # Quick setup script (production)
-├── local.yml                   # Main playbook (base-role)
-├── hosts                       # Inventory file
+├── bootstrap.sh                # Installs Homebrew, uv and Ansible, then runs the playbook
+├── local.yml                   # Main playbook
+├── hosts                       # Inventory (localhost)
 ├── ansible.cfg                 # Ansible configuration
 ├── pyproject.toml              # Python dependencies (managed by uv)
 ├── uv.lock                     # Locked dependency versions
 ├── .python-version             # Python version used by uv
 ├── .ansible-lint               # Ansible linting config
 ├── .yamllint                   # YAML linting config
+├── .pre-commit-config.yaml     # Pre-commit hooks
 ├── collections/
 │   └── requirements.yml        # Galaxy collection requirements
+├── group_vars/
+│   └── local.yml               # Overrides for this machine
 ├── roles/
 │   ├── atuin/                  # atuin and its config
 │   ├── base/                   # Base directories
@@ -148,32 +154,24 @@ mac-config/
 │   ├── git/                    # git settings, Git LFS and GnuPG
 │   ├── homebrew/               # Homebrew taps, formulae and casks
 │   └── zsh/                    # zshrc, zimrc and zimfw modules
-│       └── molecule/           # Molecule test structure
-│           └── default/
-│               ├── molecule.yml
-│               ├── converge.yml
-│               └── verify.yml
-├── group_vars/
-│   └── local.yml               # Local machine variables
+├── molecule/
+│   └── default/                # Molecule scenario for the whole playbook
+│       ├── molecule.yml
+│       ├── converge.yml
+│       └── verify.yml
 └── .github/workflows/
-    └── molecule.yml            # GitHub Actions CI/CD workflow
+    ├── lint.yml                # ansible-lint and yamllint
+    ├── markdownlint.yml        # Markdown lint
+    └── molecule.yml            # Molecule test on macOS
 ```
 
 ## Base Role
 
-The base role (current) sets up the essential base directories:
+The base role creates the directories the other roles rely on.
 
 ### What It Does
 
-- **Directory Creation**: Creates `~/.config` and `~/.local/bin` directories
-- **Idempotency**: All tasks check current state before applying changes
-
-### Verification
-
-Molecule tests verify:
-
-- Required directories are created with correct permissions
-- All tasks are idempotent (safe to run multiple times)
+- **Directories**: Creates `~/.config` and `~/.local/bin` (set in `config_dirs`)
 
 ## Homebrew Role
 
@@ -286,12 +284,11 @@ Run just this role with:
 uv run ansible-playbook -i hosts local.yml --tags git
 ```
 
-### Upcoming Roles
+## Upcoming Roles
 
-Future feature branches will add:
+Planned additions:
 
-- **vscode** - VS Code extensions and configuration
-- **launchd** - Automatic ansible-pull scheduling on login
+- **vscode** - VS Code extensions and settings
 - **macos-defaults** - macOS system defaults such as keyboard repeat rate (under consideration)
 
 ## Troubleshooting
@@ -305,36 +302,20 @@ uv sync
 uv run ansible --version
 ```
 
-### Permission denied for zsh
+### Homebrew not found
 
-```bash
-sudo chsh -s /usr/local/bin/zsh $(whoami)
-```
-
-### VS Code extensions won't install
-
-Ensure VS Code is installed and in PATH:
-
-```bash
-which code
-```
-
-### launchd service not loading
-
-Check for errors:
-
-```bash
-launchctl load ~/Library/LaunchAgents/com.user.ansible-pull.plist
-```
+The homebrew role stops early if `brew` is not in `/opt/homebrew`. Run `./bootstrap.sh`, which installs it, or install Homebrew by hand (see [Manual Setup](#option-2-manual-setup)).
 
 ### Homebrew issues
-
-Update Homebrew:
 
 ```bash
 brew update
 brew doctor
 ```
+
+### Playbook output
+
+Each run is also logged to `ansible.log` in the repository (set in `ansible.cfg`, and ignored by git).
 
 ## Testing
 
@@ -342,7 +323,7 @@ brew doctor
 
 - [uv](https://docs.astral.sh/uv/) (`brew install uv`); it installs Python 3.14 for you
 
-**Note:** Molecule tests run directly on your macOS system (no VM needed), so all required dependencies are automatically available.
+**Warning:** Molecule runs the whole playbook against the Mac it runs on, not in a VM or container. On your own Mac, `molecule test` and `molecule converge` really apply the configuration, replacing files such as `~/.zshrc` (backed up first) and changing global git settings. Use a dry run (`--check --diff`) to preview changes instead. CI runs Molecule on a fresh macOS runner.
 
 ### Set Up Testing Environment
 
@@ -358,33 +339,28 @@ uv run ansible-galaxy collection install -r collections/requirements.yml
 
 **Note:** `bootstrap.sh` runs `uv sync --no-dev`, which installs only Ansible. Plain `uv sync` also installs Molecule and the linters.
 
-### Run Molecule Tests for a Role
+### Run Molecule Tests
 
-First, set up the testing environment as described above (`uv sync`), then run the tests:
+The `default` scenario tests the whole playbook in four steps: syntax, converge, idempotence and verify. Under Molecule, the homebrew role installs only a small subset of the toolset (one tap, two formulae and one cask, set in `molecule/default/molecule.yml`) to keep runs fast.
 
 ```bash
-# Full test cycle for complete playbook (syntax → converge → idempotence → verify)
+# Full test cycle (syntax → converge → idempotence → verify)
 uv run molecule test
 
 # Or run individual steps:
-uv run molecule syntax    # Check playbook syntax
-uv run molecule converge  # Apply the playbook to localhost
-uv run molecule idempotence # Verify idempotency (converge twice)
-uv run molecule verify    # Run verification tests
-
-# Useful for debugging:
-uv run molecule converge  # Run playbook once
-uv run molecule converge --extra-vars "debug=true"  # Add debugging
+uv run molecule syntax       # Check playbook syntax
+uv run molecule converge     # Apply the playbook to this Mac
+uv run molecule idempotence  # Converge again and check that nothing changes
+uv run molecule verify       # Run the checks in verify.yml
 ```
 
-**Expected Output:**
+A successful run ends with:
 
-```bash
-INFO     default ➜ discovery: scenario test matrix: dependency, cleanup, destroy, syntax, create, prepare, converge, idempotence, side_effect, verify, cleanup, destroy
-INFO     default ➜ syntax: Executed: Successful
-INFO     default ➜ converge: Executed: Successful
-INFO     default ➜ idempotence: Executed: Successful
-INFO     default ➜ verify: Executed: Successful
+```text
+default > syntax: Executed: Successful
+default > converge: Executed: Successful
+default > idempotence: Executed: Successful
+default > verify: Executed: Successful
 ```
 
 ### Troubleshooting Molecule Tests
@@ -409,46 +385,36 @@ uv sync --reinstall
 uv run ansible-galaxy collection install -r collections/requirements.yml
 ```
 
-**Cache issues:**
-
-```bash
-# Clear Molecule scenario cache
-uv run molecule destroy
-rm -rf .molecule/
-```
-
 ### Run Linting Only
 
 ```bash
-# Run all linting
+# YAML and Ansible
 uv run yamllint .
 uv run ansible-lint
 
-# Or run individually:
-uv run yamllint roles/base/          # Check YAML syntax
-uv run ansible-lint roles/base/      # Check Ansible best practices
-markdownlint-cli2 "**/*.md"   # Check Markdown (requires Docker)
+# Markdown (the pre-commit hook runs markdownlint-cli2 in Docker)
+uv run pre-commit run markdownlint-cli2-docker --all-files
 ```
 
 ### Pre-commit Hooks
 
-Pre-commit hooks automatically validate code before commits. This repo includes:
+Pre-commit hooks check changes before each commit. This repo runs:
 
 - **uv-lock**: Keeps `uv.lock` in sync with `pyproject.toml`
-- **markdownlint**: Validates markdown formatting
 - **yamllint** and **ansible-lint**: Run via `uv run`, so they use the versions locked in `uv.lock`
+- **markdownlint**: Markdown formatting (needs Docker)
+- **actionlint** and **zizmor**: GitHub Actions workflow correctness and security
+- **gitleaks**: Catches committed secrets
+- Standard file checks: trailing whitespace, end of file, YAML syntax, merge conflict markers, large files and line endings
 
 To set up pre-commit hooks:
 
 ```bash
 # pre-commit is installed by `uv sync` (dev group)
-# Install git hooks in your repo
 uv run pre-commit install
 
 # Run hooks on all files (optional)
 uv run pre-commit run --all-files
-
-# Hooks will now run automatically on `git commit`
 ```
 
 ### Manual Configuration Testing
@@ -462,22 +428,16 @@ uv run ansible-playbook -i hosts local.yml --syntax-check
 #### 2. Check mode (dry run)
 
 ```bash
-uv run ansible-playbook -i hosts local.yml --check
+uv run ansible-playbook -i hosts local.yml --check --diff
 ```
 
 #### 3. Idempotency test
 
-Run twice and verify no changes on second run:
+Run twice and verify no changes on the second run:
 
 ```bash
 uv run ansible-playbook -i hosts local.yml
-uv run ansible-playbook -i hosts local.yml  # Should show no changes
-```
-
-#### 4. Test the base role
-
-```bash
-uv run ansible-playbook -i hosts local.yml --tags system --check
+uv run ansible-playbook -i hosts local.yml  # Should show changed=0
 ```
 
 ### CI/CD Testing
@@ -491,35 +451,31 @@ Pushes to a pull request's branch are covered by the pull request run, so each c
 
 The lint jobs run on the single-CPU `ubuntu-slim` runner. Molecule needs macOS, so it runs on `macos-latest`. See `.github/workflows/` for details.
 
-## Best Practices Implemented
+## Design Principles
 
-- **Idempotency**: All tasks are idempotent and safe to run multiple times
-- **Modularity**: Organized into logical roles that can be run independently
-- **Variables**: Centralized configuration in group_vars and role defaults
-- **Templates**: Dynamic configuration via Jinja2 templates
-- **Error Handling**: Proper error handling and informative messages
-- **Logging**: Comprehensive logging for troubleshooting
-- **Tags**: Selective execution of roles and tasks
+- **Idempotent**: Every task is safe to run repeatedly; a second run reports no changes
+- **One role per tool**: A tool that has its own configuration is installed and configured by its own role; the homebrew role holds the general toolset
+- **Leave the rest alone**: Settings are applied one at a time (for example `git config --global`) rather than overwriting whole files, and replaced files are backed up first
+- **Nothing personal or secret in the repo**: Identity, keys and tokens are set per machine
+- **Tags**: Each role can be applied on its own
 
 ## Contributing
 
-To customize this for your needs:
+To adapt this for your own Mac:
 
 1. Fork this repository
-2. Update `group_vars/local.yml` with your preferences
-3. Customize dotfiles in `roles/dotfiles/files/`
-4. Add/remove packages in `roles/homebrew/defaults/main.yml`
-5. Test with `ansible-playbook -i hosts local.yml --check`
-6. Commit your changes
+2. Edit the role defaults (`roles/*/defaults/main.yml`) and config files (`roles/*/files/`), or override defaults in `group_vars/local.yml`
+3. Preview with `uv run ansible-playbook -i hosts local.yml --check --diff`
+4. Run `uv run pre-commit run --all-files`
+5. Commit your changes and open a pull request; CI runs the linters and Molecule
 
 ## Support
 
 For issues or questions:
 
-- Check logs: `tail -f ~/Library/Logs/ansible-pull.log`
-- Review Ansible output for error messages
-- Verify prerequisites are installed
-- Check connectivity to GitHub
+- Review the Ansible output, or `ansible.log` in the repository
+- Re-run with more detail: `uv run ansible-playbook -i hosts local.yml -vv`
+- Check that the prerequisites are installed and that GitHub is reachable
 
 ## License
 
@@ -528,7 +484,6 @@ MIT License - See LICENSE file for details
 ## References
 
 - [Ansible Documentation](https://docs.ansible.com/)
-- [Ansible Best Practices](https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html)
+- [Ansible Tips and Tricks](https://docs.ansible.com/ansible/latest/tips_tricks/ansible_tips_tricks.html)
 - [Homebrew Documentation](https://docs.brew.sh/)
 - [macOS Defaults](https://macos-defaults.com/)
-- [launchd Documentation](https://www.manpagez.com/man/5/launchd.plist/)

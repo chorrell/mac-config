@@ -26,8 +26,6 @@ venv/
 .env
 .env.local
 group_vars/local.yml.local
-roles/dotfiles/files/zshrc.local
-roles/dotfiles/files/zimrc.local
 
 # Backups and temporary files
 *.bak
