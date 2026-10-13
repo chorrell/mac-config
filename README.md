@@ -403,13 +403,14 @@ uv run ansible-playbook -i hosts local.yml --tags system --check
 
 ### CI/CD Testing
 
-Molecule tests run automatically on:
+GitHub Actions runs these workflows:
 
-- Pull requests to feature branches
-- Pushes to main branch
-- Changes to roles, workflows, or linting configs
+- **Lint** (ansible-lint and yamllint) and **Molecule** run on pull requests, and again on pushes to `main` to check the merged result. Both only run when roles, playbooks, Molecule files, their own workflow or the Python dependencies change
+- **markdownlint** runs on pull requests to `main`
 
-See `.github/workflows/molecule.yml` for details.
+Pushes to a pull request's branch are covered by the pull request run, so each change is tested once. A new push to a pull request cancels the run still in progress for it.
+
+The lint jobs run on the single-CPU `ubuntu-slim` runner. Molecule needs macOS, so it runs on `macos-latest`. See `.github/workflows/` for details.
 
 ## Best Practices Implemented
 

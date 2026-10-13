@@ -7,17 +7,39 @@ on:
       - 'roles/**'
       - 'molecule/**'
       - 'local.yml'
+      - 'hosts'
+      - 'ansible.cfg'
+      - 'group_vars/**'
+      - 'collections/requirements.yml'
       - '.github/workflows/molecule.yml'
       - 'pyproject.toml'
       - 'uv.lock'
       - '.python-version'
+  # Pull requests are tested by the pull_request trigger; only main needs a
+  # push trigger, to check the merged result
   push:
     branches:
       - main
-      - 'feature/**'
+    paths:
+      - 'roles/**'
+      - 'molecule/**'
+      - 'local.yml'
+      - 'hosts'
+      - 'ansible.cfg'
+      - 'group_vars/**'
+      - 'collections/requirements.yml'
+      - '.github/workflows/molecule.yml'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.python-version'
 
 permissions:
   contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Cancel superseded runs on a PR, but let every push to main finish
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   test-playbook:
