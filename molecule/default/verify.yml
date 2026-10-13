@@ -37,6 +37,24 @@
         quiet: true
       loop: "{{ homebrew_casks }}"
 
+    - name: Verify Ghostty is installed
+      ansible.builtin.stat:
+        path: /Applications/Ghostty.app
+      register: ghostty_app
+      failed_when: not ghostty_app.stat.exists
+
+    - name: Verify MesloLGS NF fonts are installed
+      ansible.builtin.stat:
+        path: "{{ ansible_facts['user_dir'] }}/Library/Fonts/MesloLGS NF {{ item }}.ttf"
+      register: ghostty_font
+      failed_when: not ghostty_font.stat.exists
+      loop: [Regular, Bold, Italic, Bold Italic]
+
+    - name: Validate the Ghostty config, including the custom theme
+      ansible.builtin.command: >-
+        /Applications/Ghostty.app/Contents/MacOS/ghostty +validate-config
+        --config-file={{ ansible_facts['user_dir'] }}/.config/ghostty/config
+
     # fastfetch exits non-zero when it cannot parse the config file
     - name: Verify fastfetch runs with the installed config
       ansible.builtin.command: >-
