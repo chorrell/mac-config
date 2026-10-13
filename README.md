@@ -142,6 +142,7 @@ mac-config/
 │   └── requirements.yml        # Galaxy collection requirements
 ├── roles/
 │   ├── base/                   # Base directories
+│   ├── fastfetch/              # fastfetch and its preset
 │   ├── ghostty/                # Ghostty terminal, font, config and themes
 │   └── homebrew/               # Homebrew taps, formulae and casks
 │       └── molecule/           # Molecule test structure
@@ -204,6 +205,21 @@ To change a setting, edit `roles/ghostty/files/config`. Molecule runs `ghostty +
 
 ```bash
 uv run ansible-playbook -i hosts local.yml --tags ghostty
+```
+
+## fastfetch Role
+
+The fastfetch role installs [fastfetch](https://github.com/fastfetch-cli/fastfetch) and its preset.
+
+### What It Configures
+
+- **fastfetch**: Installed as a Homebrew formula
+- **Config**: `roles/fastfetch/files/config.jsonc` is copied to `~/.config/fastfetch/config.jsonc` (any existing file is backed up first). The preset shows OS, host, uptime, packages, CPU with temperature and core counts, memory, swap, disks, local IPs, battery, power adapter, locale and the colour blocks
+
+To change the preset, edit `roles/fastfetch/files/config.jsonc`. Molecule runs fastfetch against the installed config, which fails if the file cannot be parsed. Run just this role with:
+
+```bash
+uv run ansible-playbook -i hosts local.yml --tags fastfetch
 ```
 
 ### Upcoming Roles

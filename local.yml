@@ -17,6 +17,8 @@
       tags: ['packages', 'brew']
     - role: ghostty
       tags: ['ghostty', 'terminal']
+    - role: fastfetch
+      tags: ['fastfetch']
 
   post_tasks:
     - name: Configuration complete
