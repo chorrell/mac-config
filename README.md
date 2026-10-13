@@ -143,6 +143,7 @@ mac-config/
 ├── roles/
 │   ├── atuin/                  # atuin and its config
 │   ├── base/                   # Base directories
+│   ├── ghostty/                # Ghostty terminal, font, config and themes
 │   ├── homebrew/               # Homebrew taps, formulae and casks
 │   └── zsh/                    # zshrc, zimrc and zimfw modules
 │       └── molecule/           # Molecule test structure
@@ -188,6 +189,23 @@ To change the toolset, edit the lists in `roles/homebrew/defaults/main.yml`, or 
 
 ```bash
 uv run ansible-playbook -i hosts local.yml --tags brew
+```
+
+## Ghostty Role
+
+The ghostty role installs the [Ghostty](https://ghostty.org/) terminal and applies the preferred settings.
+
+### What It Sets Up
+
+- **Ghostty**: Installed as a Homebrew cask
+- **Font**: MesloLGS NF (Meslo with Nerd Font glyphs) in `~/Library/Fonts`, downloaded from a pinned commit of [romkatv/powerlevel10k-media](https://github.com/romkatv/powerlevel10k-media) and verified by SHA-256
+- **Config**: `roles/ghostty/files/config` is copied to `~/.config/ghostty/config` (any existing file is backed up first)
+- **Themes**: Custom themes in `roles/ghostty/files/themes/` are copied to `~/.config/ghostty/themes/`, including `panic`, a port of the Panic palette from macOS Terminal
+
+To change a setting, edit `roles/ghostty/files/config`. Molecule runs `ghostty +validate-config` against the installed config, which also catches a missing theme. Run just this role with:
+
+```bash
+uv run ansible-playbook -i hosts local.yml --tags ghostty
 ```
 
 ## zsh and atuin Roles

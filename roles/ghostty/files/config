@@ -1,0 +1,14 @@
+# Custom keymap to enable copying text in MacOS
+keybind = performable:cmd+c=copy_to_clipboard
+# Prevent content clipping with excessive macos rounded corners
+window-padding-x = 10
+window-padding-y = 10
+# ensure ghostty terminfo on remote ssh machines
+shell-integration-features = no-cursor,ssh-terminfo,ssh-env
+cursor-style = block
+cursor-style-blink = true
+#cursor-style = block_hollow
+font-family = "MesloLGS NF"
+theme = panic
+window-width = 115
+window-height = 25
