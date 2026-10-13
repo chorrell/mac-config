@@ -15,6 +15,10 @@
       tags: ['system']
     - role: homebrew
       tags: ['packages', 'brew']
+    - role: atuin
+      tags: ['atuin', 'shell']
+    - role: zsh
+      tags: ['zsh', 'shell']
 
   post_tasks:
     - name: Configuration complete

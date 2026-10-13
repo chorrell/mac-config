@@ -1,0 +1,7 @@
+---
+- name: Install zim modules
+  ansible.builtin.command:
+    cmd: zsh -c 'source "${ZIM_HOME}/zimfw.zsh" install -q'
+  environment:
+    ZIM_HOME: "{{ zsh_zim_home }}"
+  changed_when: true

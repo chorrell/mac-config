@@ -1,0 +1,22 @@
+---
+# The shell integration (`atuin init zsh`) lives in the zsh role's zshrc.
+# Sync is opt-in: run `atuin login` by hand, since it needs the sync key.
+
+- name: Install atuin
+  community.general.homebrew:
+    name: atuin
+    state: present
+    path: /opt/homebrew/bin
+
+- name: Create atuin config directory
+  ansible.builtin.file:
+    path: "{{ atuin_config_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Copy atuin config
+  ansible.builtin.copy:
+    src: config.toml
+    dest: "{{ atuin_config_dir }}/config.toml"
+    mode: '0644'
+    backup: true

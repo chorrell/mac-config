@@ -36,3 +36,41 @@
         fail_msg: "Cask {{ item }} is not installed"
         quiet: true
       loop: "{{ homebrew_casks }}"
+
+    - name: Verify zsh config files are present
+      ansible.builtin.stat:
+        path: "{{ ansible_facts['user_dir'] }}/{{ item }}"
+      register: zsh_file
+      failed_when: not zsh_file.stat.exists
+      loop:
+        - .zshrc
+        - .zimrc
+        - .zim/zimfw.zsh
+        - .zim/init.zsh
+
+    - name: Verify zshrc parses
+      ansible.builtin.command: zsh -n {{ ansible_facts['user_dir'] }}/.zshrc
+      changed_when: false
+
+    - name: Verify zim modules from zimrc are installed
+      ansible.builtin.stat:
+        path: "{{ ansible_facts['user_dir'] }}/.zim/modules/{{ item }}"
+      register: zim_module
+      failed_when: not zim_module.stat.exists
+      loop:
+        - bira
+        - completion
+        - direnv
+        - zsh-autosuggestions
+        - zsh-syntax-highlighting
+
+    - name: Verify atuin is installed
+      ansible.builtin.command: /opt/homebrew/bin/atuin --version
+      changed_when: false
+
+    - name: Verify atuin config is valid TOML
+      ansible.builtin.command: >-
+        {{ ansible_playbook_python }} -c
+        "import tomllib, sys; tomllib.load(open(sys.argv[1], 'rb'))"
+        {{ ansible_facts['user_dir'] }}/.config/atuin/config.toml
+      changed_when: false
