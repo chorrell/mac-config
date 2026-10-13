@@ -14,18 +14,35 @@ on:
       - 'pyproject.toml'
       - 'uv.lock'
       - '.python-version'
+  # Pull requests are tested by the pull_request trigger; only main needs a
+  # push trigger, to check the merged result
   push:
     branches:
       - main
-      - 'feature/**'
+    paths:
+      - 'roles/**'
+      - 'molecule/**'
+      - '*.yml'
+      - '.github/workflows/lint.yml'
+      - '.ansible-lint'
+      - 'collections/requirements.yml'
+      - '.yamllint'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.python-version'
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Cancel superseded runs on a PR, but let every push to main finish
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   ansible-lint:
     name: Ansible Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
@@ -47,7 +64,7 @@ jobs:
 
   yamllint:
     name: YAML Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1

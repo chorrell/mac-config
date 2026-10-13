@@ -56,6 +56,13 @@
         --config-file={{ ansible_facts['user_dir'] }}/.config/ghostty/config
       changed_when: false
 
+    # fastfetch exits non-zero when it cannot parse the config file
+    - name: Verify fastfetch runs with the installed config
+      ansible.builtin.command: >-
+        /opt/homebrew/bin/fastfetch --pipe
+        --config {{ ansible_facts['user_dir'] }}/.config/fastfetch/config.jsonc
+      changed_when: false
+
     - name: Verify zsh config files are present
       ansible.builtin.stat:
         path: "{{ ansible_facts['user_dir'] }}/{{ item }}"

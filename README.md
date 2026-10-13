@@ -143,6 +143,7 @@ mac-config/
 ├── roles/
 │   ├── atuin/                  # atuin and its config
 │   ├── base/                   # Base directories
+│   ├── fastfetch/              # fastfetch and its preset
 │   ├── ghostty/                # Ghostty terminal, font, config and themes
 │   ├── homebrew/               # Homebrew taps, formulae and casks
 │   └── zsh/                    # zshrc, zimrc and zimfw modules
@@ -206,6 +207,21 @@ To change a setting, edit `roles/ghostty/files/config`. Molecule runs `ghostty +
 
 ```bash
 uv run ansible-playbook -i hosts local.yml --tags ghostty
+```
+
+## fastfetch Role
+
+The fastfetch role installs [fastfetch](https://github.com/fastfetch-cli/fastfetch) and its preset.
+
+### What It Configures
+
+- **fastfetch**: Installed as a Homebrew formula
+- **Config**: `roles/fastfetch/files/config.jsonc` is copied to `~/.config/fastfetch/config.jsonc` (any existing file is backed up first). The preset shows OS, host, uptime, packages, CPU with temperature and core counts, memory, swap, disks, local IPs, battery, power adapter, locale and the colour blocks
+
+To change the preset, edit `roles/fastfetch/files/config.jsonc`. Molecule runs fastfetch against the installed config, which fails if the file cannot be parsed. Run just this role with:
+
+```bash
+uv run ansible-playbook -i hosts local.yml --tags fastfetch
 ```
 
 ## zsh and atuin Roles
@@ -430,13 +446,14 @@ uv run ansible-playbook -i hosts local.yml --tags system --check
 
 ### CI/CD Testing
 
-Molecule tests run automatically on:
+GitHub Actions runs these workflows:
 
-- Pull requests to feature branches
-- Pushes to main branch
-- Changes to roles, workflows, or linting configs
+- **Lint** (ansible-lint and yamllint) and **Molecule** run on pull requests, and again on pushes to `main` to check the merged result. Both only run when roles, playbooks, Molecule files, their own workflow or the Python dependencies change
+- **markdownlint** runs on pull requests to `main`
 
-See `.github/workflows/molecule.yml` for details.
+Pushes to a pull request's branch are covered by the pull request run, so each change is tested once. A new push to a pull request cancels the run still in progress for it.
+
+The lint jobs run on the single-CPU `ubuntu-slim` runner. Molecule needs macOS, so it runs on `macos-latest`. See `.github/workflows/` for details.
 
 ## Best Practices Implemented
 

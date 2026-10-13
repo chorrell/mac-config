@@ -17,6 +17,8 @@
       tags: ['packages', 'brew']
     - role: ghostty
       tags: ['ghostty', 'terminal']
+    - role: fastfetch
+      tags: ['fastfetch']
     - role: atuin
       tags: ['atuin', 'shell']
     - role: zsh
