@@ -22,6 +22,15 @@ provisioner:
           localhost:
             ansible_connection: local
             ansible_python_interpreter: "{{ ansible_playbook_python }}"
+            # Install a small subset in CI instead of the full toolset. This
+            # still exercises taps (with trust), formulae and casks.
+            homebrew_taps:
+              - terraform-linters/tap
+            homebrew_formulae:
+              - shfmt
+              - actionlint
+            homebrew_casks:
+              - terraform-linters/tap/tflint
 
 verifier:
   name: ansible

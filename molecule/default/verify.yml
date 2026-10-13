@@ -12,3 +12,27 @@
       loop:
         - "{{ ansible_facts['user_dir'] }}/.config"
         - "{{ ansible_facts['user_dir'] }}/.local/bin"
+
+    - name: List installed Homebrew formulae
+      ansible.builtin.command: brew list --formula --full-name
+      register: brew_formulae
+      changed_when: false
+
+    - name: List installed Homebrew casks
+      ansible.builtin.command: brew list --cask --full-name
+      register: brew_casks
+      changed_when: false
+
+    - name: Verify Homebrew formulae are installed
+      ansible.builtin.assert:
+        that: item.split('/') | last in brew_formulae.stdout_lines | map('split', '/') | map('last')
+        fail_msg: "Formula {{ item }} is not installed"
+        quiet: true
+      loop: "{{ homebrew_formulae }}"
+
+    - name: Verify Homebrew casks are installed
+      ansible.builtin.assert:
+        that: item.split('/') | last in brew_casks.stdout_lines | map('split', '/') | map('last')
+        fail_msg: "Cask {{ item }} is not installed"
+        quiet: true
+      loop: "{{ homebrew_casks }}"

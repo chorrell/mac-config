@@ -1,0 +1,67 @@
+---
+# Homebrew role defaults
+#
+# Homebrew itself is installed by bootstrap.sh before Ansible runs. Tools that
+# come with their own configuration (Ghostty, fastfetch, atuin, ...) are
+# installed by their own roles, not listed here.
+
+homebrew_prefix: /opt/homebrew
+
+# Third-party taps
+homebrew_taps:
+  - cloudflare/cloudflare
+  - derailed/k9s
+  - docker/tap
+  - domcyrus/rustnet
+  - hashicorp/tap
+  - snyk/tap
+  - teamookla/speedtest
+  - terraform-linters/tap
+
+# Command-line tools
+homebrew_formulae:
+  # Infrastructure as code
+  - hashicorp/tap/packer
+  - hashicorp/tap/terraform
+  - opentofu
+  - terragrunt
+  - cloudflare/cloudflare/cf-terraforming
+  # Kubernetes and cloud
+  - derailed/k9s/k9s
+  - kops
+  - minikube
+  - doctl
+  # Security and linting
+  - actionlint
+  - markdownlint-cli2
+  - shfmt
+  - snyk/tap/snyk
+  - trivy
+  - zizmor
+  - pre-commit
+  # Development
+  - bats-core
+  - d2
+  - direnv
+  - fx
+  - gh
+  - git
+  - k6
+  - mise
+  - pandoc
+  - uv
+  # Networking and system
+  - btop
+  - domcyrus/rustnet/rustnet
+  - htop
+  - pwgen
+  - teamookla/speedtest/speedtest
+  - trippy
+  - wget
+
+# GUI applications and binary casks
+homebrew_casks:
+  - docker/tap/sbx
+  - drawio
+  - homebrew-app
+  - terraform-linters/tap/tflint
