@@ -141,10 +141,12 @@ mac-config/
 ├── collections/
 │   └── requirements.yml        # Galaxy collection requirements
 ├── roles/
+│   ├── atuin/                  # atuin and its config
 │   ├── base/                   # Base directories
 │   ├── fastfetch/              # fastfetch and its preset
 │   ├── ghostty/                # Ghostty terminal, font, config and themes
-│   └── homebrew/               # Homebrew taps, formulae and casks
+│   ├── homebrew/               # Homebrew taps, formulae and casks
+│   └── zsh/                    # zshrc, zimrc and zimfw modules
 │       └── molecule/           # Molecule test structure
 │           └── default/
 │               ├── molecule.yml
@@ -222,11 +224,36 @@ To change the preset, edit `roles/fastfetch/files/config.jsonc`. Molecule runs f
 uv run ansible-playbook -i hosts local.yml --tags fastfetch
 ```
 
+## zsh and atuin Roles
+
+The zsh role sets up the shell with [zimfw](https://zimfw.sh/), and the atuin role adds [atuin](https://atuin.sh/) history search. macOS already uses `/bin/zsh` as the login shell, so the shell itself is not changed.
+
+### What They Configure
+
+- **zshrc**: `roles/zsh/files/zshrc` is copied to `~/.zshrc`. It runs fastfetch, initializes zimfw, sets the history options and aliases, and activates mise and atuin when they are installed
+- **zimrc**: `roles/zsh/files/zimrc` is copied to `~/.zimrc`, listing the zim modules (bira prompt, completions, syntax highlighting, history substring search, autosuggestions, Homebrew and direnv)
+- **zimfw**: Downloaded to `~/.zim`, with the modules installed. Changing `zimrc` reinstalls the modules on the next run
+- **atuin**: Installed as a Homebrew formula, with `roles/atuin/files/config.toml` copied to `~/.config/atuin/config.toml` (daemon-backed fuzzy search, enter runs the command, ctrl+number shortcuts). The up arrow stays with zsh-history-substring-search; atuin is on ctrl+r
+
+Existing `~/.zshrc`, `~/.zimrc` and atuin config files are backed up before they are replaced.
+
+### Machine-specific Settings and Secrets
+
+`~/.zshrc` sources `~/.zshrc.local` if it exists. Use it for anything that should not be in this repository, such as PATH entries for tools installed outside Homebrew or API tokens. Neither `~/.zshrc.local` nor `~/.zshenv` is managed.
+
+To sync shell history between machines, run `atuin login` after the playbook; it needs your sync key, so it is not automated.
+
+Run just these roles with:
+
+```bash
+uv run ansible-playbook -i hosts local.yml --tags shell
+```
+
 ### Upcoming Roles
 
 Future feature branches will add:
 
-- **dotfiles** - Shell configuration with zimfw and git setup
+- **dotfiles** - Git configuration
 - **vscode** - VS Code extensions and configuration
 - **launchd** - Automatic ansible-pull scheduling on login
 - **macos-defaults** - macOS system defaults such as keyboard repeat rate (under consideration)

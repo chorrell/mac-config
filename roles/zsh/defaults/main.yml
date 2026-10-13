@@ -1,0 +1,5 @@
+---
+# zsh role defaults
+
+zsh_zim_home: "{{ ansible_facts['user_dir'] }}/.zim"
+zsh_zimfw_url: https://github.com/zimfw/zimfw/releases/latest/download/zimfw.zsh

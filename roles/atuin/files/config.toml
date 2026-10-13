@@ -1,0 +1,19 @@
+# Managed by mac-config (roles/atuin).
+# All options: https://docs.atuin.sh/configuration/config/
+
+## Use ctrl+<number> instead of alt+<number> to pick a result
+ctrl_n_shortcuts = true
+
+## Run the selected command straight away instead of editing it first
+enter_accept = true
+
+## Fuzzy search served by the background daemon
+search_mode = "daemon-fuzzy"
+
+[sync]
+## Use the record store for sync (only applies after `atuin login`)
+records = true
+
+[daemon]
+enabled = true
+autostart = true

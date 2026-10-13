@@ -19,6 +19,10 @@
       tags: ['ghostty', 'terminal']
     - role: fastfetch
       tags: ['fastfetch']
+    - role: atuin
+      tags: ['atuin', 'shell']
+    - role: zsh
+      tags: ['zsh', 'shell']
 
   post_tasks:
     - name: Configuration complete

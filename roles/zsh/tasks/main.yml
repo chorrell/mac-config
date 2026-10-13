@@ -1,0 +1,39 @@
+---
+# macOS already uses /bin/zsh as the login shell, so only the configuration
+# and the zimfw modules are managed here.
+
+- name: Copy zshrc
+  ansible.builtin.copy:
+    src: zshrc
+    dest: "{{ ansible_facts['user_dir'] }}/.zshrc"
+    mode: '0644'
+    backup: true
+
+- name: Copy zimrc
+  ansible.builtin.copy:
+    src: zimrc
+    dest: "{{ ansible_facts['user_dir'] }}/.zimrc"
+    mode: '0644'
+    backup: true
+  notify: Install zim modules
+
+- name: Create zim home directory
+  ansible.builtin.file:
+    path: "{{ zsh_zim_home }}"
+    state: directory
+    mode: '0755'
+
+# Downloaded once; zimfw updates itself afterwards with `zimfw upgrade`
+- name: Download zimfw
+  ansible.builtin.get_url:
+    url: "{{ zsh_zimfw_url }}"
+    dest: "{{ zsh_zim_home }}/zimfw.zsh"
+    mode: '0644'
+    force: false
+
+- name: Install zim modules
+  ansible.builtin.command:
+    cmd: zsh -c 'source "${ZIM_HOME}/zimfw.zsh" init -q'
+    creates: "{{ zsh_zim_home }}/init.zsh"
+  environment:
+    ZIM_HOME: "{{ zsh_zim_home }}"
