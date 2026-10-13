@@ -10,7 +10,6 @@ homebrew_prefix: /opt/homebrew
 # Third-party taps
 homebrew_taps:
   - derailed/k9s
-  - docker/tap
   - domcyrus/rustnet
   - hashicorp/tap
   - terraform-linters/tap
@@ -54,6 +53,5 @@ homebrew_formulae:
 
 # GUI applications and binary casks
 homebrew_casks:
-  - docker/tap/sbx
   - homebrew-app
   - terraform-linters/tap/tflint
