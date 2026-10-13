@@ -100,3 +100,30 @@
         "import tomllib, sys; tomllib.load(open(sys.argv[1], 'rb'))"
         {{ ansible_facts['user_dir'] }}/.config/atuin/config.toml
       changed_when: false
+
+    - name: Load git role defaults
+      ansible.builtin.include_vars:
+        file: ../../roles/git/defaults/main.yml
+
+    - name: Read global git config
+      ansible.builtin.command: git config --global --get {{ item.key }}
+      register: git_value
+      changed_when: false
+      failed_when: git_value.stdout != item.value
+      loop: "{{ git_config | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+
+    - name: Verify Git LFS and GnuPG are installed
+      ansible.builtin.command: "{{ item }}"
+      changed_when: false
+      loop:
+        - /opt/homebrew/bin/git-lfs version
+        - /opt/homebrew/bin/gpg --version
+        - /opt/homebrew/bin/pinentry-mac --version
+
+    - name: Verify gpg-agent uses pinentry-mac
+      ansible.builtin.command: >-
+        grep -qx 'pinentry-program /opt/homebrew/bin/pinentry-mac'
+        {{ ansible_facts['user_dir'] }}/.gnupg/gpg-agent.conf
+      changed_when: false

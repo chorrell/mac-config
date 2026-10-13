@@ -1,0 +1,5 @@
+---
+# gpg-agent starts again on demand and rereads gpg-agent.conf
+- name: Restart gpg-agent
+  ansible.builtin.command: /opt/homebrew/bin/gpgconf --kill gpg-agent
+  changed_when: true

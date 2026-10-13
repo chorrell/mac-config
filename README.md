@@ -145,6 +145,7 @@ mac-config/
 │   ├── base/                   # Base directories
 │   ├── fastfetch/              # fastfetch and its preset
 │   ├── ghostty/                # Ghostty terminal, font, config and themes
+│   ├── git/                    # git settings, Git LFS and GnuPG
 │   ├── homebrew/               # Homebrew taps, formulae and casks
 │   └── zsh/                    # zshrc, zimrc and zimfw modules
 │       └── molecule/           # Molecule test structure
@@ -249,11 +250,46 @@ Run just these roles with:
 uv run ansible-playbook -i hosts local.yml --tags shell
 ```
 
+## Git Role
+
+The git role installs git, Git LFS and GnuPG, and applies the global git settings.
+
+### What It Manages
+
+- **Packages**: `git`, `git-lfs`, `gnupg` and `pinentry-mac` from Homebrew
+- **Settings**: Each entry in `git_config` (`roles/git/defaults/main.yml`) is set with `git config --global`, so settings that are not listed are left alone. This covers `pull.rebase`, `fetch.prune`, the Keychain credential helper, aliases and the Git LFS filter
+- **Global gitignore**: `roles/git/files/gitignore` is copied to `~/.gitignore` and set as `core.excludesfile`
+- **GnuPG**: `pinentry-mac` is set as the passphrase prompt in `~/.gnupg/gpg-agent.conf`. Keys and `gpg.conf` are not managed
+- **Clean-up**: Filters left by the retired git-media and hawser tools are removed
+
+### Identity and Commit Signing
+
+Your name, email and signing key are not managed, since they can differ between machines (a work Mac, for example) and should not be in a public repository. Existing values are left alone. Set them once on each new Mac:
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+```
+
+To sign commits with GPG, import your private key, then point git at it and at the Homebrew `gpg`:
+
+```bash
+gpg --import /path/to/private-key.asc
+git config --global user.signingkey <KEY-ID>
+git config --global gpg.program /opt/homebrew/bin/gpg
+git config --global commit.gpgsign true
+```
+
+Run just this role with:
+
+```bash
+uv run ansible-playbook -i hosts local.yml --tags git
+```
+
 ### Upcoming Roles
 
 Future feature branches will add:
 
-- **dotfiles** - Git configuration
 - **vscode** - VS Code extensions and configuration
 - **launchd** - Automatic ansible-pull scheduling on login
 - **macos-defaults** - macOS system defaults such as keyboard repeat rate (under consideration)
