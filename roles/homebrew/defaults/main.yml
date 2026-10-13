@@ -53,5 +53,4 @@ homebrew_formulae:
 
 # GUI applications and binary casks
 homebrew_casks:
-  - homebrew-app
   - terraform-linters/tap/tflint
