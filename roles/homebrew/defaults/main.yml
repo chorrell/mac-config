@@ -36,7 +36,6 @@ homebrew_formulae:
   - pre-commit
   # Development
   - bats-core
-  - d2
   - direnv
   - fx
   - gh
