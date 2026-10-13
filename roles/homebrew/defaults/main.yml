@@ -9,7 +9,6 @@ homebrew_prefix: /opt/homebrew
 
 # Third-party taps
 homebrew_taps:
-  - cloudflare/cloudflare
   - derailed/k9s
   - docker/tap
   - domcyrus/rustnet
@@ -23,7 +22,6 @@ homebrew_formulae:
   - hashicorp/tap/terraform
   - opentofu
   - terragrunt
-  - cloudflare/cloudflare/cf-terraforming
   # Kubernetes and cloud
   - derailed/k9s/k9s
   - kops
