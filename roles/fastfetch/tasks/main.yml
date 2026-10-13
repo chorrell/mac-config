@@ -1,0 +1,19 @@
+---
+- name: Install fastfetch
+  community.general.homebrew:
+    name: fastfetch
+    state: present
+    path: /opt/homebrew/bin
+
+- name: Create fastfetch config directory
+  ansible.builtin.file:
+    path: "{{ fastfetch_config_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Copy fastfetch config
+  ansible.builtin.copy:
+    src: config.jsonc
+    dest: "{{ fastfetch_config_dir }}/config.jsonc"
+    mode: '0644'
+    backup: true

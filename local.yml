@@ -15,6 +15,8 @@
       tags: ['system']
     - role: homebrew
       tags: ['packages', 'brew']
+    - role: fastfetch
+      tags: ['fastfetch']
 
   post_tasks:
     - name: Configuration complete
