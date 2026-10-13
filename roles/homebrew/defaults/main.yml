@@ -14,8 +14,6 @@ homebrew_taps:
   - docker/tap
   - domcyrus/rustnet
   - hashicorp/tap
-  - snyk/tap
-  - teamookla/speedtest
   - terraform-linters/tap
 
 # Command-line tools
@@ -35,7 +33,6 @@ homebrew_formulae:
   - actionlint
   - markdownlint-cli2
   - shfmt
-  - snyk/tap/snyk
   - trivy
   - zizmor
   - pre-commit
@@ -55,7 +52,6 @@ homebrew_formulae:
   - domcyrus/rustnet/rustnet
   - htop
   - pwgen
-  - teamookla/speedtest/speedtest
   - trippy
   - wget
 
