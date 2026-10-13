@@ -55,6 +55,5 @@ homebrew_formulae:
 # GUI applications and binary casks
 homebrew_casks:
   - docker/tap/sbx
-  - drawio
   - homebrew-app
   - terraform-linters/tap/tflint
