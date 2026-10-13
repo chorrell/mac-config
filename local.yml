@@ -23,6 +23,8 @@
       tags: ['atuin', 'shell']
     - role: zsh
       tags: ['zsh', 'shell']
+    - role: git
+      tags: ['git']
 
   post_tasks:
     - name: Configuration complete

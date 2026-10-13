@@ -1,0 +1,39 @@
+---
+# git role defaults
+#
+# Identity and commit signing (user.name, user.email, user.signingkey,
+# commit.gpgsign, gpg.program) are not managed here: they differ between
+# machines, such as a work Mac, and stay out of this public repository. Set
+# them by hand on each Mac (see the README).
+
+git_global_ignore: "{{ ansible_facts['user_dir'] }}/.gitignore"
+
+# Global settings, applied one by one with `git config --global`, so settings
+# not listed here are left alone
+git_config:
+  core.excludesfile: "{{ git_global_ignore }}"
+  core.quotepath: "false"
+  credential.helper: osxkeychain
+  init.defaultBranch: main
+  fetch.prune: "true"
+  pull.rebase: "true"
+  push.default: simple
+  alias.st: status
+  alias.co: checkout
+  alias.br: branch
+  alias.last: log -1 HEAD
+  alias.unstage: reset HEAD --
+  # Git LFS filter, as written by `git lfs install`
+  filter.lfs.clean: git-lfs clean -- %f
+  filter.lfs.smudge: git-lfs smudge -- %f
+  filter.lfs.process: git-lfs filter-process
+  filter.lfs.required: "true"
+
+# Settings removed if present (filters from the retired git-media and hawser)
+git_config_absent:
+  - filter.media.clean
+  - filter.media.smudge
+  - filter.media.required
+  - filter.hawser.clean
+  - filter.hawser.smudge
+  - filter.hawser.required

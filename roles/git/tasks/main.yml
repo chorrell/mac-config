@@ -1,0 +1,50 @@
+---
+- name: Install git, Git LFS and GnuPG
+  community.general.homebrew:
+    name:
+      - git
+      - git-lfs
+      - gnupg
+      - pinentry-mac
+    state: present
+    path: /opt/homebrew/bin
+
+- name: Copy global gitignore
+  ansible.builtin.copy:
+    src: gitignore
+    dest: "{{ git_global_ignore }}"
+    mode: '0644'
+    backup: true
+
+- name: Set global git config
+  community.general.git_config:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    scope: global
+  loop: "{{ git_config | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: Remove obsolete global git config
+  community.general.git_config:
+    name: "{{ item }}"
+    scope: global
+    state: absent
+  loop: "{{ git_config_absent }}"
+
+# pinentry-mac asks for the key passphrase in a dialog and can save it in the
+# macOS Keychain. Only this line is managed; keys and gpg.conf are left alone.
+- name: Create GnuPG home directory
+  ansible.builtin.file:
+    path: "{{ ansible_facts['user_dir'] }}/.gnupg"
+    state: directory
+    mode: '0700'
+
+- name: Use pinentry-mac for GnuPG passphrase prompts
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_facts['user_dir'] }}/.gnupg/gpg-agent.conf"
+    regexp: '^pinentry-program\s'
+    line: pinentry-program /opt/homebrew/bin/pinentry-mac
+    create: true
+    mode: '0600'
+  notify: Restart gpg-agent
