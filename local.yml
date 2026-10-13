@@ -15,6 +15,8 @@
       tags: ['system']
     - role: homebrew
       tags: ['packages', 'brew']
+    - role: ghostty
+      tags: ['ghostty', 'terminal']
 
   post_tasks:
     - name: Configuration complete

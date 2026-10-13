@@ -1,0 +1,39 @@
+---
+- name: Install Ghostty
+  community.general.homebrew_cask:
+    name: ghostty
+    state: present
+    path: /opt/homebrew/bin
+
+- name: Install MesloLGS NF fonts
+  ansible.builtin.get_url:
+    url: "{{ ghostty_font_base_url }}/{{ item.name | urlencode }}"
+    dest: "{{ ghostty_fonts_dir }}/{{ item.name }}"
+    checksum: "sha256:{{ item.sha256 }}"
+    mode: '0644'
+  loop: "{{ ghostty_fonts }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Create Ghostty config directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ ghostty_config_dir }}"
+    - "{{ ghostty_config_dir }}/themes"
+
+- name: Copy Ghostty themes
+  ansible.builtin.copy:
+    src: "themes/{{ item }}"
+    dest: "{{ ghostty_config_dir }}/themes/{{ item }}"
+    mode: '0644'
+  loop: "{{ ghostty_themes }}"
+
+- name: Copy Ghostty config
+  ansible.builtin.copy:
+    src: config
+    dest: "{{ ghostty_config_dir }}/config"
+    mode: '0644'
+    backup: true

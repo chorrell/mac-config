@@ -1,0 +1,32 @@
+# Panic Palette — converted from macOS Terminal theme
+
+background = #111c2a
+foreground = #ffffff
+
+# Bold/cursor
+bold-color = #ffffff
+cursor-color = #999999
+
+# Selection — original uses macOS system selectedTextBackgroundColor;
+# using a reasonable approximation here.
+#selection-background = #2d4562
+selection-background = #336699
+selection-foreground = #f6f7ee
+
+# 16-color ANSI palette
+palette = 0=#222222
+palette = 1=#ff3333
+palette = 2=#33ff33
+palette = 3=#ffcc33
+palette = 4=#336699
+palette = 5=#663399
+palette = 6=#66cccc
+palette = 7=#999999
+palette = 8=#666666
+palette = 9=#f82939
+palette = 10=#33ff33
+palette = 11=#ffcc33
+palette = 12=#336699
+palette = 13=#663399
+palette = 14=#66cccc
+palette = 15=#cccccc

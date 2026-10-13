@@ -1,0 +1,24 @@
+---
+# Ghostty role defaults
+
+ghostty_config_dir: "{{ ansible_facts['user_dir'] }}/.config/ghostty"
+
+# Custom themes in roles/ghostty/files/themes/, copied to the themes directory
+ghostty_themes:
+  - panic
+
+# MesloLGS NF (Meslo patched with Nerd Font glyphs), the font set in the
+# Ghostty config. Downloaded from a pinned commit and checked against the
+# SHA-256 of each file.
+ghostty_fonts_dir: "{{ ansible_facts['user_dir'] }}/Library/Fonts"
+ghostty_font_base_url: >-
+  https://github.com/romkatv/powerlevel10k-media/raw/145eb9fbc2f42ee408dacd9b22d8e6e0e553f83d
+ghostty_fonts:
+  - name: MesloLGS NF Regular.ttf
+    sha256: d97946186e97f8d7c0139e8983abf40a1d2d086924f2c5dbf1c29bd8f2c6e57d
+  - name: MesloLGS NF Bold.ttf
+    sha256: b6c0199cf7c7483c8343ea020658925e6de0aeb318b89908152fcb4d19226003
+  - name: MesloLGS NF Italic.ttf
+    sha256: 6f357bcbe2597704e157a915625928bca38364a89c22a4ac36e7a116dcd392ef
+  - name: MesloLGS NF Bold Italic.ttf
+    sha256: 56b4131adecec052c4b324efb818dd326d586dbc316fc68f98f1cae2eb8d1220
