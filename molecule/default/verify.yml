@@ -95,12 +95,6 @@
       loop_control:
         label: "{{ item.key }}"
 
-    - name: Verify the Monaspace Xenon Var font is installed
-      ansible.builtin.stat:
-        path: "{{ ansible_facts['user_dir'] }}/Library/Fonts/Monaspace Xenon Var.ttf"
-      register: vscode_font
-      failed_when: not vscode_font.stat.exists
-
     # fastfetch exits non-zero when it cannot parse the config file
     - name: Verify fastfetch runs with the installed config
       ansible.builtin.command: >-

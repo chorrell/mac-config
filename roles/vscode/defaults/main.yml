@@ -5,11 +5,6 @@ vscode_app: /Applications/Visual Studio Code.app
 vscode_cli: "{{ vscode_app }}/Contents/Resources/app/bin/code"
 vscode_user_dir: "{{ ansible_facts['user_dir'] }}/Library/Application Support/Code/User"
 
-# Font casks for the editor and terminal fonts in vscode_settings. MesloLGS NF
-# comes from the ghostty role.
-vscode_font_casks:
-  - font-monaspace-var
-
 # Extensions installed with `code --install-extension`. Extensions that are
 # pulled in as dependencies (Pylance, debugpy, Remote Explorer, ...) are not
 # listed. Installed extensions that are not listed are left alone.
@@ -41,7 +36,8 @@ vscode_extensions:
 # listed here are left alone; a listed key replaces its whole value.
 vscode_settings:
   # Editor
-  editor.fontFamily: "'Monaspace Xenon Var', monospace"
+  # VS Code's own default on macOS; the terminal font, MesloLGS NF, comes from the ghostty role
+  editor.fontFamily: "Menlo, Monaco, 'Courier New', monospace"
   editor.fontLigatures: true
   editor.minimap.enabled: false
   editor.renderControlCharacters: true
