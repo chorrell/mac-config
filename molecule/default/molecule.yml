@@ -31,6 +31,8 @@ provisioner:
               - actionlint
             homebrew_casks:
               - terraform-linters/tap/tflint
+            vscode_extensions:
+              - editorconfig.editorconfig
 
 verifier:
   name: ansible

@@ -17,6 +17,8 @@
       tags: ['packages', 'brew']
     - role: ghostty
       tags: ['ghostty', 'terminal']
+    - role: vscode
+      tags: ['vscode']
     - role: fastfetch
       tags: ['fastfetch']
     - role: atuin

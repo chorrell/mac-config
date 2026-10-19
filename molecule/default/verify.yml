@@ -56,6 +56,55 @@
         --config-file={{ ansible_facts['user_dir'] }}/.config/ghostty/config
       changed_when: false
 
+    - name: Verify VS Code is installed
+      ansible.builtin.stat:
+        path: /Applications/Visual Studio Code.app
+      register: vscode_app
+      failed_when: not vscode_app.stat.exists
+
+    - name: Verify the code CLI is on the Homebrew PATH
+      ansible.builtin.command: /opt/homebrew/bin/code --version
+      changed_when: false
+
+    - name: List installed VS Code extensions
+      ansible.builtin.command: >-
+        "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" --list-extensions
+      register: vscode_installed
+      changed_when: false
+
+    - name: Verify VS Code extensions are installed
+      ansible.builtin.assert:
+        that: item | lower in vscode_installed.stdout_lines | map('lower')
+        fail_msg: "VS Code extension {{ item }} is not installed"
+        quiet: true
+      loop: "{{ vscode_extensions }}"
+
+    # Loaded under a name so the Molecule override of vscode_extensions still applies
+    - name: Load vscode role defaults
+      ansible.builtin.include_vars:
+        file: ../../roles/vscode/defaults/main.yml
+        name: vscode_defaults
+
+    - name: Read VS Code settings
+      ansible.builtin.slurp:
+        src: "{{ ansible_facts['user_dir'] }}/Library/Application Support/Code/User/settings.json"
+      register: vscode_settings_file
+
+    - name: Verify VS Code settings
+      ansible.builtin.assert:
+        that: (vscode_settings_file.content | b64decode | from_json)[item.key] == item.value
+        fail_msg: "VS Code setting {{ item.key }} is not set"
+        quiet: true
+      loop: "{{ vscode_defaults.vscode_settings | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+
+    - name: Verify the Hack font is installed
+      ansible.builtin.stat:
+        path: "{{ ansible_facts['user_dir'] }}/Library/Fonts/Hack-Regular.ttf"
+      register: vscode_font
+      failed_when: not vscode_font.stat.exists
+
     # fastfetch exits non-zero when it cannot parse the config file
     - name: Verify fastfetch runs with the installed config
       ansible.builtin.command: >-
