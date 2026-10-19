@@ -155,7 +155,7 @@ mac-config/
 │   ├── ghostty/                # Ghostty terminal, font, config and themes
 │   ├── git/                    # git settings, Git LFS and GnuPG
 │   ├── homebrew/               # Homebrew taps, formulae and casks
-│   ├── vscode/                 # VS Code, extensions and settings
+│   ├── vscode/                 # VS Code, extensions, settings and font
 │   └── zsh/                    # zshrc, zimrc and zimfw modules
 ├── molecule/
 │   └── default/                # Molecule scenario for the whole playbook
@@ -218,7 +218,7 @@ The vscode role installs [Visual Studio Code](https://code.visualstudio.com/), i
 ### What It Installs and Configures
 
 - **VS Code**: Installed as a Homebrew cask, unless `/Applications/Visual Studio Code.app` already exists (for example from a download)
-- **Fonts**: The editor uses Menlo, the macOS default. The integrated terminal uses MesloLGS NF from the ghostty role
+- **Fonts**: The editor uses [Hack](https://sourcefoundry.org/hack/), installed from the `font-hack` cask. The integrated terminal uses MesloLGS NF from the ghostty role
 - **Extensions**: Each entry in `vscode_extensions` is installed with `code --install-extension` if missing. Other installed extensions are left alone
 - **Settings**: Each entry in `vscode_settings` is merged into `~/Library/Application Support/Code/User/settings.json` (any existing file is backed up first), so settings that are not listed are left alone. The file must be plain JSON: the role stops rather than drop comments
 

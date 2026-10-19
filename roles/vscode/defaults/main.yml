@@ -5,6 +5,10 @@ vscode_app: /Applications/Visual Studio Code.app
 vscode_cli: "{{ vscode_app }}/Contents/Resources/app/bin/code"
 vscode_user_dir: "{{ ansible_facts['user_dir'] }}/Library/Application Support/Code/User"
 
+# Font casks for the editor font in vscode_settings
+vscode_font_casks:
+  - font-hack
+
 # Extensions installed with `code --install-extension`. Extensions that are
 # pulled in as dependencies (Pylance, debugpy, Remote Explorer, ...) are not
 # listed. Installed extensions that are not listed are left alone.
@@ -36,8 +40,8 @@ vscode_extensions:
 # listed here are left alone; a listed key replaces its whole value.
 vscode_settings:
   # Editor
-  # VS Code's own default on macOS; the terminal font, MesloLGS NF, comes from the ghostty role
-  editor.fontFamily: "Menlo, Monaco, 'Courier New', monospace"
+  # Hack (https://sourcefoundry.org/hack/); the terminal font, MesloLGS NF, comes from the ghostty role
+  editor.fontFamily: Hack, Menlo, monospace
   editor.fontLigatures: true
   editor.minimap.enabled: false
   editor.renderControlCharacters: true
