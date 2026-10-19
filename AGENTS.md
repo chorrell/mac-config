@@ -35,7 +35,7 @@ roles/<role>/files/        # Config files copied to the Mac
 roles/<role>/tasks/        # Tasks
 group_vars/local.yml       # Per-machine overrides
 molecule/default/          # Molecule scenario for the whole playbook (verify.yml holds the checks)
-.github/workflows/         # lint.yml, markdownlint.yml, molecule.yml
+.github/workflows/         # lint.yml, linting.yml (shell and Markdown), molecule.yml
 ```
 
 ## Conventions

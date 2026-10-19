@@ -30,6 +30,18 @@ repos:
       - id: check-added-large-files
       - id: mixed-line-ending
 
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
+    hooks:
+      - id: shellcheck
+
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.14.1-1
+    hooks:
+      # Same flags as the shell-lint workflow in chorrell/workflows
+      - id: shfmt
+        args: [-w, -sr, -i, '2', -ci]
+
   # Run yamllint and ansible-lint from the uv environment so the hooks use
   # the same versions pinned in uv.lock as local runs and CI.
   - repo: local
