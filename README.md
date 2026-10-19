@@ -241,6 +241,8 @@ The docker role installs [Docker Desktop](https://www.docker.com/products/docker
 - **Docker Desktop**: Installed as the `docker-desktop` Homebrew cask, unless `/Applications/Docker.app` already exists (for example from a download). Docker Desktop updates itself
 - **CLI**: The cask links `docker`, the credential helpers and the Compose plugin into `/usr/local/bin`. That directory belongs to root, so when Docker Desktop is installed the playbook asks for your password and passes it to Homebrew's `sudo`
 
+Homebrew tags a file inside `Docker.app` after moving it into place, which macOS blocks unless the terminal running the playbook has **App Management** permission (System Settings → Privacy & Security → App Management). If the install fails with `xattr: [Errno 1] Operation not permitted`, turn it on for your terminal, restart the terminal and run the playbook again.
+
 Open Docker Desktop once after the first run to accept the licence and let it install its helper; Docker settings, images and containers are not managed. Run just this role with:
 
 ```bash
