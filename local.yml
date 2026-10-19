@@ -19,6 +19,8 @@
       tags: ['ghostty', 'terminal']
     - role: vscode
       tags: ['vscode']
+    - role: docker
+      tags: ['docker']
     - role: fastfetch
       tags: ['fastfetch']
     - role: atuin

@@ -5,6 +5,7 @@ Ansible playbook that sets up a new Mac for development and DevOps work, based o
 - Homebrew and the command-line toolset (infrastructure as code, Kubernetes, linters and more)
 - The [Ghostty](https://ghostty.org/) terminal, with its config, theme and font
 - [VS Code](https://code.visualstudio.com/) with its extensions and settings
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [fastfetch](https://github.com/fastfetch-cli/fastfetch) and its preset
 - zsh with [zimfw](https://zimfw.sh/), and [atuin](https://atuin.sh/) shell history
 - Shared git settings, Git LFS and GnuPG
@@ -114,6 +115,7 @@ Each role has a tag, so you can apply one part at a time:
 | `brew` | homebrew |
 | `ghostty` | ghostty |
 | `vscode` | vscode |
+| `docker` | docker |
 | `fastfetch` | fastfetch |
 | `shell` | atuin and zsh (or `atuin`, `zsh` on their own) |
 | `git` | git |
@@ -151,6 +153,7 @@ mac-config/
 ├── roles/
 │   ├── atuin/                  # atuin and its config
 │   ├── base/                   # Base directories
+│   ├── docker/                 # Docker Desktop
 │   ├── fastfetch/              # fastfetch and its preset
 │   ├── ghostty/                # Ghostty terminal, font, config and themes
 │   ├── git/                    # git settings, Git LFS and GnuPG
@@ -227,6 +230,29 @@ Both lists are in `roles/vscode/defaults/main.yml`. If VS Code Settings Sync is 
 
 ```bash
 uv run ansible-playbook -i hosts local.yml --tags vscode
+```
+
+## Docker Role
+
+The docker role installs [Docker Desktop](https://www.docker.com/products/docker-desktop/), which provides the `docker` CLI, Docker Compose and the Docker engine.
+
+### What the Docker Role Installs
+
+- **Docker Desktop**: Installed as the `docker-desktop` Homebrew cask, unless `/Applications/Docker.app` already exists (for example from a download). Docker Desktop updates itself
+- **CLI**: The cask links `docker`, the credential helpers and the Compose plugin into `/usr/local/bin`. That directory belongs to root, so when Docker Desktop is installed the playbook asks for your password and passes it to Homebrew's `sudo`
+
+Open Docker Desktop once after the first run to accept the licence and let it install its helper; Docker settings, images and containers are not managed. Run just this role with:
+
+```bash
+uv run ansible-playbook -i hosts local.yml --tags docker
+```
+
+### Replacing a Downloaded Docker Desktop
+
+To let Homebrew manage a copy of Docker Desktop that was installed from a download, quit Docker Desktop and run this in a terminal (it asks for your password). Images, containers and settings are kept, since they live outside the app:
+
+```bash
+brew install --cask --force docker-desktop
 ```
 
 ## fastfetch Role
