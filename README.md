@@ -28,14 +28,25 @@ cd mac-config
 ./bootstrap.sh
 ```
 
+On a new Mac, the first `git` command asks to install the Xcode Command Line Tools. Accept, wait for the install to finish, then run `git clone` again.
+
 The bootstrap script will:
 
-1. Install Homebrew (if not present)
-2. Install [uv](https://docs.astral.sh/uv/) (if not present)
-3. Install a uv-managed Python 3.14 and Ansible into `.venv`
-4. Install Ansible Galaxy collections
-5. Validate the playbook syntax
-6. Run the Ansible playbook
+1. Check that it is running on a Mac with Apple Silicon
+2. Install Homebrew (if not present) and add it to the `PATH` for the rest of the script
+3. Install [uv](https://docs.astral.sh/uv/) (if not present)
+4. Install a uv-managed Python 3.14 and Ansible into `.venv`
+5. Install Ansible Galaxy collections
+6. Validate the playbook syntax
+7. If Docker Desktop is not installed yet, remind you to give your terminal the App Management permission it needs (see [Docker Role](#docker-role))
+8. Run the Ansible playbook
+
+It can be run from any directory. Arguments are passed on to `ansible-playbook`, so you can also use it to apply one role or to preview changes:
+
+```bash
+./bootstrap.sh --tags vscode
+./bootstrap.sh --check --diff
+```
 
 ### Option 2: Manual Setup
 
@@ -44,6 +55,9 @@ If you prefer to do this step by step:
 ```bash
 # Install Homebrew if needed
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Add Homebrew to the PATH of this shell (the installer does not)
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Install uv
 brew install uv
@@ -65,6 +79,9 @@ Some settings are personal or secret, so they are not in this repository. Set th
 - **git identity and signing**: see [Identity and Commit Signing](#identity-and-commit-signing)
 - **Machine-specific shell settings and secrets**: put them in `~/.zshrc.local` (see [Machine-specific Settings and Secrets](#machine-specific-settings-and-secrets))
 - **Shell history sync**: run `atuin login`
+- **Docker Desktop**: open it once to accept the licence and let it install its helper
+
+Open a new terminal window afterwards so the new `~/.zshrc` is loaded.
 
 ## Python and Ansible Environment
 
@@ -453,6 +470,7 @@ Pre-commit hooks check changes before each commit. This repo runs:
 - **markdownlint**: Markdown formatting (needs Docker)
 - **actionlint** and **zizmor**: GitHub Actions workflow correctness and security
 - **gitleaks**: Catches committed secrets
+- **shellcheck** and **shfmt**: Shell script checks and formatting (four-space indents) for `bootstrap.sh`
 - Standard file checks: trailing whitespace, end of file, YAML syntax, merge conflict markers, large files and line endings
 
 To set up pre-commit hooks:
