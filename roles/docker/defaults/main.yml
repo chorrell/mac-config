@@ -1,0 +1,4 @@
+---
+# docker role defaults
+
+docker_app: /Applications/Docker.app

@@ -105,6 +105,17 @@
       register: vscode_font
       failed_when: not vscode_font.stat.exists
 
+    - name: Verify Docker Desktop is installed
+      ansible.builtin.stat:
+        path: /Applications/Docker.app
+      register: docker_app
+      failed_when: not docker_app.stat.exists
+
+    # The CLI works without the Docker engine, which is not started in CI
+    - name: Verify the docker CLI runs
+      ansible.builtin.command: /usr/local/bin/docker --version
+      changed_when: false
+
     # fastfetch exits non-zero when it cannot parse the config file
     - name: Verify fastfetch runs with the installed config
       ansible.builtin.command: >-

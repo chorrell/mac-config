@@ -1,0 +1,26 @@
+---
+# Docker Desktop may already be installed from a download, which the cask would
+# refuse to replace, so only install it when the app is missing
+- name: Check for Docker Desktop
+  ansible.builtin.stat:
+    path: "{{ docker_app }}"
+  register: docker_app_stat
+
+# The cask links docker and its helpers into /usr/local/bin, which is owned by
+# root, so Homebrew needs sudo. Without a terminal (as in CI) the prompt is
+# skipped and sudo must work without a password.
+- name: Ask for the administrator password to install Docker Desktop
+  ansible.builtin.pause:
+    prompt: "Password for sudo (Docker Desktop links docker into /usr/local/bin)"
+    echo: false
+  register: docker_sudo
+  no_log: true
+  when: not docker_app_stat.stat.exists and not ansible_check_mode
+
+- name: Install Docker Desktop
+  community.general.homebrew_cask:
+    name: docker-desktop
+    state: present
+    path: /opt/homebrew/bin
+    sudo_password: "{{ docker_sudo.user_input | default(omit, true) }}"
+  when: not docker_app_stat.stat.exists
