@@ -4,6 +4,7 @@ Ansible playbook that sets up a new Mac for development and DevOps work, based o
 
 - Homebrew and the command-line toolset (infrastructure as code, Kubernetes, linters and more)
 - The [Ghostty](https://ghostty.org/) terminal, with its config, theme and font
+- [VS Code](https://code.visualstudio.com/) with its extensions and settings
 - [fastfetch](https://github.com/fastfetch-cli/fastfetch) and its preset
 - zsh with [zimfw](https://zimfw.sh/), and [atuin](https://atuin.sh/) shell history
 - Shared git settings, Git LFS and GnuPG
@@ -112,6 +113,7 @@ Each role has a tag, so you can apply one part at a time:
 | `system` | base |
 | `brew` | homebrew |
 | `ghostty` | ghostty |
+| `vscode` | vscode |
 | `fastfetch` | fastfetch |
 | `shell` | atuin and zsh (or `atuin`, `zsh` on their own) |
 | `git` | git |
@@ -153,6 +155,7 @@ mac-config/
 │   ├── ghostty/                # Ghostty terminal, font, config and themes
 │   ├── git/                    # git settings, Git LFS and GnuPG
 │   ├── homebrew/               # Homebrew taps, formulae and casks
+│   ├── vscode/                 # VS Code, extensions, settings and font
 │   └── zsh/                    # zshrc, zimrc and zimfw modules
 ├── molecule/
 │   └── default/                # Molecule scenario for the whole playbook
@@ -206,6 +209,23 @@ To change a setting, edit `roles/ghostty/files/config`. Molecule runs `ghostty +
 
 ```bash
 uv run ansible-playbook -i hosts local.yml --tags ghostty
+```
+
+## VS Code Role
+
+The vscode role installs [Visual Studio Code](https://code.visualstudio.com/), its extensions and the preferred user settings.
+
+### What It Installs and Configures
+
+- **VS Code**: Installed as a Homebrew cask, unless `/Applications/Visual Studio Code.app` already exists (for example from a download)
+- **Font**: Monaspace Xenon Var, the editor font, from the `font-monaspace-var` cask. The terminal uses MesloLGS NF from the ghostty role
+- **Extensions**: Each entry in `vscode_extensions` is installed with `code --install-extension` if missing. Other installed extensions are left alone
+- **Settings**: Each entry in `vscode_settings` is merged into `~/Library/Application Support/Code/User/settings.json` (any existing file is backed up first), so settings that are not listed are left alone. The file must be plain JSON: the role stops rather than drop comments
+
+Both lists are in `roles/vscode/defaults/main.yml`. If VS Code Settings Sync is turned on, it syncs the same settings and extensions, so changes made in the editor can come back on the next sync. Run just this role with:
+
+```bash
+uv run ansible-playbook -i hosts local.yml --tags vscode
 ```
 
 ## fastfetch Role
@@ -288,7 +308,6 @@ uv run ansible-playbook -i hosts local.yml --tags git
 
 Planned additions:
 
-- **vscode** - VS Code extensions and settings
 - **macos-defaults** - macOS system defaults such as keyboard repeat rate (under consideration)
 
 ## Troubleshooting

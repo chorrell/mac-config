@@ -1,0 +1,62 @@
+---
+# VS Code may already be installed from a download, which the cask would
+# refuse to replace, so only install it when the app is missing
+- name: Check for Visual Studio Code
+  ansible.builtin.stat:
+    path: "{{ vscode_app }}"
+  register: vscode_app_stat
+
+- name: Install Visual Studio Code
+  community.general.homebrew_cask:
+    name: visual-studio-code
+    state: present
+    path: /opt/homebrew/bin
+  when: not vscode_app_stat.stat.exists
+
+- name: Install editor fonts
+  community.general.homebrew_cask:
+    name: "{{ vscode_font_casks }}"
+    state: present
+    path: /opt/homebrew/bin
+
+- name: List installed VS Code extensions
+  ansible.builtin.command: '"{{ vscode_cli }}" --list-extensions'
+  register: vscode_installed_extensions
+  changed_when: false
+  check_mode: false
+  when: vscode_app_stat.stat.exists or not ansible_check_mode
+
+- name: Install VS Code extensions
+  ansible.builtin.command: '"{{ vscode_cli }}" --install-extension {{ item }}'
+  loop: "{{ vscode_extensions }}"
+  when: item | lower not in (vscode_installed_extensions.stdout_lines | default([]) | map('lower'))
+  changed_when: true
+
+- name: Create VS Code user directory
+  ansible.builtin.file:
+    path: "{{ vscode_user_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Check for VS Code settings
+  ansible.builtin.stat:
+    path: "{{ vscode_user_dir }}/settings.json"
+  register: vscode_settings_stat
+
+- name: Read VS Code settings
+  ansible.builtin.slurp:
+    src: "{{ vscode_user_dir }}/settings.json"
+  register: vscode_settings_file
+  when: vscode_settings_stat.stat.exists and vscode_settings_stat.stat.size > 0
+
+# Fails if settings.json has comments or trailing commas, rather than losing them
+- name: Merge VS Code settings
+  ansible.builtin.copy:
+    content: "{{ vscode_current | combine(vscode_settings) | to_nice_json(indent=2) }}\n"
+    dest: "{{ vscode_user_dir }}/settings.json"
+    mode: '0644'
+    backup: true
+  vars:
+    vscode_current: >-
+      {{ (vscode_settings_file.content | b64decode | from_json)
+         if vscode_settings_file is not skipped else {} }}

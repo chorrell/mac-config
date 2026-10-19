@@ -1,0 +1,154 @@
+---
+# vscode role defaults
+
+vscode_app: /Applications/Visual Studio Code.app
+vscode_cli: "{{ vscode_app }}/Contents/Resources/app/bin/code"
+vscode_user_dir: "{{ ansible_facts['user_dir'] }}/Library/Application Support/Code/User"
+
+# Font casks for the editor and terminal fonts in vscode_settings. MesloLGS NF
+# comes from the ghostty role.
+vscode_font_casks:
+  - font-monaspace-var
+
+# Extensions installed with `code --install-extension`. Extensions that are
+# pulled in as dependencies (Pylance, debugpy, Remote Explorer, ...) are not
+# listed. Installed extensions that are not listed are left alone.
+vscode_extensions:
+  - anthropic.claude-code
+  - davidanson.vscode-markdownlint
+  - docker.docker
+  - editorconfig.editorconfig
+  - github.codespaces
+  - github.github-vscode-theme
+  - github.vscode-github-actions
+  - github.vscode-pull-request-github
+  - golang.go
+  - hashicorp.hcl
+  - hashicorp.terraform
+  - mechatroner.rainbow-csv
+  - mkhl.shfmt
+  - ms-azuretools.vscode-containers
+  - ms-azuretools.vscode-docker
+  - ms-python.python
+  - ms-vscode-remote.remote-containers
+  - ms-vscode-remote.remote-ssh
+  - redhat.ansible
+  - redhat.vscode-xml
+  - redhat.vscode-yaml
+  - timonwong.shellcheck
+
+# User settings, merged into settings.json key by key. Settings that are not
+# listed here are left alone; a listed key replaces its whole value.
+vscode_settings:
+  # Editor
+  editor.fontFamily: "'Monaspace Xenon Var', monospace"
+  editor.fontLigatures: true
+  editor.minimap.enabled: false
+  editor.renderControlCharacters: true
+  editor.renderWhitespace: all
+  editor.smoothScrolling: true
+  editor.cursorSmoothCaretAnimation: "on"
+  editor.scrollbar.horizontalScrollbarSize: 14
+  editor.suggestSelection: first
+  diffEditor.ignoreTrimWhitespace: false
+  diffEditor.renderIndicators: false
+  debug.console.fontSize: 14
+  files.associations:
+    "*.bats": shellscript
+  "[python]":
+    editor.defaultFormatter: ms-python.autopep8
+  "[shellscript]":
+    editor.defaultFormatter: mkhl.shfmt
+  "[dockerfile]":
+    editor.quickSuggestions:
+      strings: true
+  "[dockercompose]":
+    editor.insertSpaces: true
+    editor.tabSize: 2
+    editor.autoIndent: advanced
+    editor.quickSuggestions:
+      other: true
+      comments: false
+      strings: true
+    editor.defaultFormatter: redhat.vscode-yaml
+  "[github-actions-workflow]":
+    editor.defaultFormatter: redhat.vscode-yaml
+
+  # Workbench
+  workbench.colorTheme: GitHub Dark Default
+  workbench.startupEditor: newUntitledFile
+  workbench.editor.enablePreview: false
+  workbench.editor.closeOnFileDelete: true
+  workbench.editor.highlightModifiedTabs: true
+  workbench.editorAssociations:
+    "*.ipynb": jupyter-notebook
+    "*.plist": default
+  breadcrumbs.enabled: true
+  explorer.compactFolders: false
+  extensions.ignoreRecommendations: true
+  notebook.cellToolbarLocation:
+    default: right
+    jupyter-notebook: left
+  security.workspace.trust.untrustedFiles: open
+
+  # Terminal
+  terminal.integrated.defaultProfile.osx: zsh
+  terminal.integrated.fontFamily: MesloLGS NF
+  terminal.integrated.fontLigatures.enabled: true
+  terminal.integrated.cursorBlinking: true
+  terminal.integrated.enableImages: true
+  terminal.integrated.hideOnStartup: whenEmpty
+  terminal.integrated.inheritEnv: false
+
+  # Git and GitHub
+  git.autofetch: true
+  git.fetchOnPull: true
+  git.pruneOnFetch: true
+  git.confirmSync: false
+  git.enableSmartCommit: true
+  git.allowNoVerifyCommit: true
+  git.confirmNoVerifyCommit: false
+  git.ignoreMissingGitWarning: true
+  git.ignoreRebaseWarning: true
+  git.showPushSuccessNotification: true
+  git.untrackedChanges: separate
+  githubPullRequests.pullBranch: never
+  codespaces.accountProvider: GitHub
+
+  # AI and chat
+  claudeCode.preferredLocation: panel
+  chat.agent.enabled: false
+  chat.agentSessionProjection.enabled: true
+  chat.exitAfterDelegation: true
+  chat.tips.enabled: false
+  chat.viewProgressBadge.enabled: true
+  chat.viewSessions.orientation: stacked
+  github.copilot.enable:
+    "*": false
+    plaintext: true
+    markdown: false
+    scminput: false
+  github.copilot.nextEditSuggestions.enabled: false
+
+  # Languages and tools
+  ansible.lightspeed.enabled: false
+  ansible.lightspeed.suggestions.enabled: false
+  ansible.mcpServer.enabled: true
+  docker.extension.enableComposeLanguageServer: false
+  go.toolsManagement.autoUpdate: true
+  python.defaultInterpreterPath: python3
+  # Let the GitHub Actions extension validate workflows instead of the YAML schema store
+  yaml.disableSchemaDetection:
+    - "**/.github/workflows/*.yml"
+    - "**/.github/workflows/*.yaml"
+    - "**/.gitea/workflows/*.yml"
+    - "**/.gitea/workflows/*.yaml"
+    - "**/.forgejo/workflows/*.yml"
+    - "**/.forgejo/workflows/*.yaml"
+
+  # Telemetry
+  telemetry.telemetryLevel: error
+  telemetry.feedback.enabled: false
+  telemetry.editStats.enabled: false
+  redhat.telemetry.enabled: false
+  workbench.statusBar.feedback.visible: false
