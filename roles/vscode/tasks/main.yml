@@ -13,6 +13,14 @@
     path: /opt/homebrew/bin
   when: not vscode_app_stat.stat.exists
 
+# The cask links the CLI itself; this covers a VS Code installed from a download
+- name: Link the code CLI into the Homebrew bin directory
+  ansible.builtin.file:
+    src: "{{ vscode_cli }}"
+    dest: /opt/homebrew/bin/code
+    state: link
+  when: vscode_app_stat.stat.exists or not ansible_check_mode
+
 - name: Install editor fonts
   community.general.homebrew_cask:
     name: "{{ vscode_font_casks }}"

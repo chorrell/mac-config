@@ -218,6 +218,7 @@ The vscode role installs [Visual Studio Code](https://code.visualstudio.com/), i
 ### What It Installs and Configures
 
 - **VS Code**: Installed as a Homebrew cask, unless `/Applications/Visual Studio Code.app` already exists (for example from a download)
+- **`code` CLI**: Linked into `/opt/homebrew/bin`, so it is on the `PATH` either way
 - **Fonts**: The editor uses [Hack](https://sourcefoundry.org/hack/), installed from the `font-hack` cask. The integrated terminal uses MesloLGS NF from the ghostty role
 - **Extensions**: Each entry in `vscode_extensions` is installed with `code --install-extension` if missing. Other installed extensions are left alone
 - **Settings**: Each entry in `vscode_settings` is merged into `~/Library/Application Support/Code/User/settings.json` (any existing file is backed up first), so settings that are not listed are left alone. The file must be plain JSON: the role stops rather than drop comments

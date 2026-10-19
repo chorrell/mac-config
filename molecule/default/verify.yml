@@ -62,6 +62,10 @@
       register: vscode_app
       failed_when: not vscode_app.stat.exists
 
+    - name: Verify the code CLI is on the Homebrew PATH
+      ansible.builtin.command: /opt/homebrew/bin/code --version
+      changed_when: false
+
     - name: List installed VS Code extensions
       ansible.builtin.command: >-
         "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" --list-extensions
