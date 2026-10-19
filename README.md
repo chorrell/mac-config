@@ -182,7 +182,10 @@ mac-config/
 │       ├── molecule.yml
 │       ├── converge.yml
 │       └── verify.yml
+├── tests/
+│   └── bootstrap.bats          # bats tests for bootstrap.sh
 └── .github/workflows/
+    ├── bootstrap.yml           # bats tests for bootstrap.sh on macOS
     ├── lint.yml                # ansible-lint and yamllint
     ├── linting.yml             # Shell script and Markdown lint
     └── molecule.yml            # Molecule test on macOS
@@ -450,6 +453,14 @@ uv sync --reinstall
 uv run ansible-galaxy collection install -r collections/requirements.yml
 ```
 
+### Test the Bootstrap Script
+
+`tests/bootstrap.bats` runs `bootstrap.sh` with stub `uv`, `brew`, `curl` and `uname` commands and a fake Homebrew prefix, so it never installs anything or runs the playbook. It checks the order of the setup steps, that arguments reach `ansible-playbook`, the macOS and Apple Silicon checks, failures, and installing Homebrew and uv when they are missing. It needs [bats](https://github.com/bats-core/bats-core), which the homebrew role installs:
+
+```bash
+bats tests/
+```
+
 ### Run Linting Only
 
 ```bash
@@ -511,11 +522,12 @@ uv run ansible-playbook -i hosts local.yml  # Should show changed=0
 GitHub Actions runs these workflows:
 
 - **Lint** (ansible-lint and yamllint) and **Molecule** run on pull requests, and again on pushes to `main` to check the merged result. Both only run when roles, playbooks, Molecule files, their own workflow or the Python dependencies change
-- **markdownlint** runs on pull requests to `main`
+- **Bootstrap Tests** runs the bats tests for `bootstrap.sh`, on pull requests and pushes to `main` that change the script, its tests or the workflow
+- **linting** (shellcheck, shfmt and markdownlint) runs on pull requests to `main`
 
 Pushes to a pull request's branch are covered by the pull request run, so each change is tested once. A new push to a pull request cancels the run still in progress for it.
 
-The lint jobs run on the single-CPU `ubuntu-slim` runner. Molecule needs macOS, so it runs on `macos-latest`. See `.github/workflows/` for details.
+The lint jobs run on the single-CPU `ubuntu-slim` runner. Molecule and the bootstrap tests need macOS, so they run on `macos-latest`; the bootstrap tests then use the system bash 3.2, as a new Mac does. See `.github/workflows/` for details.
 
 ## Design Principles
 
