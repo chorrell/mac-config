@@ -1,0 +1,45 @@
+---
+name: Bootstrap Tests
+
+on:
+  pull_request:
+    paths:
+      - 'bootstrap.sh'
+      - 'tests/**'
+      - '.github/workflows/bootstrap.yml'
+  # Pull requests are tested by the pull_request trigger; only main needs a
+  # push trigger, to check the merged result
+  push:
+    branches:
+      - main
+    paths:
+      - 'bootstrap.sh'
+      - 'tests/**'
+      - '.github/workflows/bootstrap.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Cancel superseded runs on a PR, but let every push to main finish
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  bats:
+    name: Bats Tests
+    # macOS, so the tests run the script with the system bash 3.2
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install bats
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: '1'
+        run: brew install bats-core
+
+      - name: Run bats tests
+        run: bats --print-output-on-failure tests/

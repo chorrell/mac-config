@@ -14,10 +14,10 @@ set -euo pipefail
 #   --help    Show this help message
 # ============================================================================
 
-# Constants
-readonly BREW_PREFIX="/opt/homebrew"
+# Constants (BREW_PREFIX and DOCKER_APP can be set by the tests in tests/)
+readonly BREW_PREFIX="${BREW_PREFIX:-/opt/homebrew}"
 readonly HOMEBREW_INSTALL_URL="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
-readonly DOCKER_APP="/Applications/Docker.app"
+readonly DOCKER_APP="${DOCKER_APP:-/Applications/Docker.app}"
 
 # Color output (disabled in non-interactive shells)
 if [[ -t 1 ]] && [[ -z "${NO_COLOR:-}" ]]; then
@@ -136,7 +136,7 @@ esac
 # Validate Environment
 # ============================================================================
 
-[[ "$OSTYPE" == darwin* ]] || error "This script must be run on macOS"
+[[ "$(uname -s)" == Darwin ]] || error "This script must be run on macOS"
 
 # The playbook expects Homebrew in /opt/homebrew, its Apple Silicon location
 [[ "$(uname -m)" == arm64 ]] || error "This script needs a Mac with Apple Silicon"
@@ -200,8 +200,7 @@ if [[ ! -d "$DOCKER_APP" ]] && [[ -t 0 ]]; then
 fi
 
 header "Step 6: Running Ansible playbook"
-# ${1+"$@"} because macOS's bash 3.2 treats an empty "$@" as unbound under set -u
-uv run --no-dev ansible-playbook -i hosts local.yml ${1+"$@"}
+uv run --no-dev ansible-playbook -i hosts local.yml "$@"
 footer
 
 success "Bootstrap completed successfully"

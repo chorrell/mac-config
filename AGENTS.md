@@ -16,13 +16,16 @@ uv run yamllint .
 uv run ansible-lint
 uv run pre-commit run --all-files   # everything, including markdownlint (needs Docker)
 
+# Test bootstrap.sh (stubs everything; never runs the playbook)
+bats tests/
+
 # Check without changing anything
 uv run ansible-playbook -i hosts local.yml --syntax-check
 uv run ansible-playbook -i hosts local.yml --check --diff
 uv run ansible-playbook -i hosts local.yml --tags <tag> --check --diff
 ```
 
-**Do not run `ansible-playbook local.yml`, `molecule converge` or `molecule test` without being asked.** They apply the
+**Do not run `ansible-playbook local.yml`, `./bootstrap.sh`, `molecule converge` or `molecule test` without being asked.** They apply the
 playbook to the Mac they run on (there is no VM), replacing files such as `~/.zshrc` and changing global git config.
 Use `--check --diff` to show what a change would do. CI runs the full Molecule test on a fresh macOS runner.
 
@@ -35,7 +38,8 @@ roles/<role>/files/        # Config files copied to the Mac
 roles/<role>/tasks/        # Tasks
 group_vars/local.yml       # Per-machine overrides
 molecule/default/          # Molecule scenario for the whole playbook (verify.yml holds the checks)
-.github/workflows/         # lint.yml, linting.yml (shell and Markdown), molecule.yml
+tests/                     # bats tests for bootstrap.sh
+.github/workflows/         # lint.yml, linting.yml (shell and Markdown), molecule.yml, bootstrap.yml
 ```
 
 ## Conventions
