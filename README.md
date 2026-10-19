@@ -184,7 +184,7 @@ mac-config/
 │       └── verify.yml
 └── .github/workflows/
     ├── lint.yml                # ansible-lint and yamllint
-    ├── markdownlint.yml        # Markdown lint
+    ├── linting.yml             # Shell script and Markdown lint
     └── molecule.yml            # Molecule test on macOS
 ```
 
@@ -470,7 +470,7 @@ Pre-commit hooks check changes before each commit. This repo runs:
 - **markdownlint**: Markdown formatting (needs Docker)
 - **actionlint** and **zizmor**: GitHub Actions workflow correctness and security
 - **gitleaks**: Catches committed secrets
-- **shellcheck** and **shfmt**: Shell script checks and formatting (four-space indents) for `bootstrap.sh`
+- **shellcheck** and **shfmt**: Shell script checks and formatting for `bootstrap.sh`, with the same versions and flags as the `linting` workflow
 - Standard file checks: trailing whitespace, end of file, YAML syntax, merge conflict markers, large files and line endings
 
 To set up pre-commit hooks:

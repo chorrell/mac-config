@@ -38,9 +38,9 @@ repos:
   - repo: https://github.com/scop/pre-commit-shfmt
     rev: v3.14.1-1
     hooks:
-      # Four-space indents, as in bootstrap.sh
+      # Same flags as the shell-lint workflow in chorrell/workflows
       - id: shfmt
-        args: [-w, -s, -i, '4']
+        args: [-w, -sr, -i, '2', -ci]
 
   # Run yamllint and ansible-lint from the uv environment so the hooks use
   # the same versions pinned in uv.lock as local runs and CI.

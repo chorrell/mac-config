@@ -1,5 +1,5 @@
 ---
-name: markdownlint
+name: linting
 
 on:
   pull_request:
@@ -11,9 +11,11 @@ permissions:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  # Cancel superseded runs on a PR, but let every push to main finish
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: true
 
 jobs:
+  shell-lint:
+    uses: chorrell/workflows/.github/workflows/shell-lint.yml@v1
+
   markdownlint:
     uses: chorrell/workflows/.github/workflows/markdownlint.yml@v1
