@@ -522,7 +522,7 @@ uv run ansible-playbook -i hosts local.yml  # Should show changed=0
 GitHub Actions runs these workflows:
 
 - **Lint** (ansible-lint and yamllint) and **Molecule** run on pull requests, and again on pushes to `main` to check the merged result. Both only run when roles, playbooks, Molecule files, their own workflow or the Python dependencies change
-- **Bootstrap Tests** runs the bats tests for `bootstrap.sh`, on pull requests and pushes to `main` that change the script, its tests or the workflow
+- **Bootstrap Tests** runs the bats tests for `bootstrap.sh` on every pull request (it is a required check), and on pushes to `main` that change the script, its tests or the workflow
 - **linting** (shellcheck, shfmt and markdownlint) runs on pull requests to `main`
 
 Pushes to a pull request's branch are covered by the pull request run, so each change is tested once. A new push to a pull request cancels the run still in progress for it.
