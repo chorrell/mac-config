@@ -2,11 +2,9 @@
 name: Bootstrap Tests
 
 on:
+  # Every pull request, since Bats Tests is a required check (a required check
+  # that is skipped by a path filter would block the merge)
   pull_request:
-    paths:
-      - 'bootstrap.sh'
-      - 'tests/**'
-      - '.github/workflows/bootstrap.yml'
   # Pull requests are tested by the pull_request trigger; only main needs a
   # push trigger, to check the merged result
   push:
