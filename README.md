@@ -1,5 +1,9 @@
 # Mac Configuration with Ansible
 
+[![Bootstrap Tests](https://github.com/chorrell/mac-config/actions/workflows/bootstrap.yml/badge.svg)](https://github.com/chorrell/mac-config/actions/workflows/bootstrap.yml)
+[![Lint](https://github.com/chorrell/mac-config/actions/workflows/lint.yml/badge.svg)](https://github.com/chorrell/mac-config/actions/workflows/lint.yml)
+[![Molecule Testing](https://github.com/chorrell/mac-config/actions/workflows/molecule.yml/badge.svg)](https://github.com/chorrell/mac-config/actions/workflows/molecule.yml)
+
 Ansible playbook that sets up a new Mac for development and DevOps work, based on the setup of my current Mac. Clone the repository and run one script to get:
 
 - Homebrew and the command-line toolset (infrastructure as code, Kubernetes, linters and more)
