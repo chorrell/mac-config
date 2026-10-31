@@ -27,7 +27,6 @@ homebrew_formulae:
   - minikube
   - doctl
   # Security and linting
-  - actionlint
   - markdownlint-cli2
   - shfmt
   - trivy
