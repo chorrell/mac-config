@@ -1,5 +1,8 @@
 # Custom keymap to enable copying text in MacOS
 keybind = performable:cmd+c=copy_to_clipboard
+# Don't copy text on select. `false` works on Ghostty 1.3 (the Homebrew cask)
+# and 1.4, which reads it as `none`.
+copy-on-select = false
 # Prevent content clipping with excessive macos rounded corners
 window-padding-x = 10
 window-padding-y = 10
