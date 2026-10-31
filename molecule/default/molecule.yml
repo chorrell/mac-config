@@ -28,7 +28,7 @@ provisioner:
               - terraform-linters/tap
             homebrew_formulae:
               - shfmt
-              - actionlint
+              - zizmor
             homebrew_casks:
               - terraform-linters/tap/tflint
             vscode_extensions:

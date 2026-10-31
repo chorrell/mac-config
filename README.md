@@ -483,7 +483,7 @@ Pre-commit hooks check changes before each commit. This repo runs:
 - **uv-lock**: Keeps `uv.lock` in sync with `pyproject.toml`
 - **yamllint** and **ansible-lint**: Run via `uv run`, so they use the versions locked in `uv.lock`
 - **markdownlint**: Markdown formatting (needs Docker)
-- **actionlint** and **zizmor**: GitHub Actions workflow correctness and security
+- **zizmor**: GitHub Actions workflow linting and security. actionlint isn't used because it rejects GitHub's `$/` self-repository `uses:` syntax ([rhysd/actionlint#711](https://github.com/rhysd/actionlint/issues/711))
 - **gitleaks**: Catches committed secrets
 - **shellcheck** and **shfmt**: Shell script checks and formatting for `bootstrap.sh`, with the same versions and flags as the `linting` workflow
 - Standard file checks: trailing whitespace, end of file, YAML syntax, merge conflict markers, large files and line endings
