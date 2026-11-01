@@ -14,7 +14,7 @@ uv run ansible-galaxy collection install -r collections/requirements.yml
 # Lint
 uv run yamllint .
 uv run ansible-lint
-uv run pre-commit run --all-files   # everything, including markdownlint (needs Docker)
+prek run --all-files                # everything, including markdownlint (needs Docker)
 
 # Test bootstrap.sh (stubs everything; never runs the playbook)
 bats tests/
@@ -71,11 +71,11 @@ tests/                     # bats tests for bootstrap.sh
 - PRs are squash-merged, so each lands as one commit; merged branches are deleted automatically.
 - Force-push only to feature branches, with `git push --force-with-lease`. To update a branch with `main`, merge
   `main` in.
-- Before opening a PR, run `uv run pre-commit run --all-files` and a `--check --diff` run of the affected tags.
+- Before opening a PR, run `prek run --all-files` and a `--check --diff` run of the affected tags.
 
 ## Gotchas
 
 - Molecule overrides the homebrew role's lists with a small subset (`molecule/default/molecule.yml`), so CI does not
   install the full toolset.
 - Lint jobs run on the `ubuntu-slim` runner (1 CPU, 15-minute limit, no Docker); Molecule needs `macos-latest`.
-- `pre-commit`'s markdownlint hook runs in Docker.
+- The markdownlint hook runs in Docker.

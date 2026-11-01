@@ -92,7 +92,7 @@ Open a new terminal window afterwards so the new `~/.zshrc` is loaded.
 Ansible and its Python dependencies are managed with [uv](https://docs.astral.sh/uv/) and are never installed into the system Python:
 
 - `.python-version` pins Python **3.14**, the newest version supported by ansible-core 2.21.
-- `pyproject.toml` declares the dependencies (`ansible-core` at runtime; Molecule, ansible-lint, yamllint and pre-commit in the `dev` group).
+- `pyproject.toml` declares the dependencies (`ansible-core` at runtime; Molecule, ansible-lint and yamllint in the `dev` group).
 - `uv.lock` pins exact versions so every machine and CI run gets the same environment.
 - `[tool.uv] python-preference = "only-managed"` makes uv download its own Python and ignore the system or Homebrew one.
 - The inventory sets `ansible_python_interpreter` to `{{ ansible_playbook_python }}`, so modules also run under the uv-managed Python.
@@ -472,13 +472,15 @@ bats tests/
 uv run yamllint .
 uv run ansible-lint
 
-# Markdown (the pre-commit hook runs markdownlint-cli2 in Docker)
-uv run pre-commit run markdownlint-cli2-docker --all-files
+# Markdown (the hook runs markdownlint-cli2 in Docker)
+prek run markdownlint-cli2-docker --all-files
 ```
 
 ### Pre-commit Hooks
 
-Pre-commit hooks check changes before each commit. This repo runs:
+Pre-commit hooks check changes before each commit. They run with
+[prek](https://github.com/j178/prek), a faster drop-in replacement for
+pre-commit that reads the same `.pre-commit-config.yaml`. This repo runs:
 
 - **uv-lock**: Keeps `uv.lock` in sync with `pyproject.toml`
 - **yamllint** and **ansible-lint**: Run via `uv run`, so they use the versions locked in `uv.lock`
@@ -491,11 +493,11 @@ Pre-commit hooks check changes before each commit. This repo runs:
 To set up pre-commit hooks:
 
 ```bash
-# pre-commit is installed by `uv sync` (dev group)
-uv run pre-commit install
+# prek is installed by the homebrew role
+prek install
 
 # Run hooks on all files (optional)
-uv run pre-commit run --all-files
+prek run --all-files
 ```
 
 ### Manual Configuration Testing
@@ -548,7 +550,7 @@ To adapt this for your own Mac:
 1. Fork this repository
 2. Edit the role defaults (`roles/*/defaults/main.yml`) and config files (`roles/*/files/`), or override defaults in `group_vars/local.yml`
 3. Preview with `uv run ansible-playbook -i hosts local.yml --check --diff`
-4. Run `uv run pre-commit run --all-files`
+4. Run `prek run --all-files`
 5. Commit your changes and open a pull request; CI runs the linters and Molecule
 
 ## Support
