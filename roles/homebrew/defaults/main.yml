@@ -31,7 +31,7 @@ homebrew_formulae:
   - shfmt
   - trivy
   - zizmor
-  - pre-commit
+  - prek
   # Development
   - bats-core
   - direnv
