@@ -1,8 +1,6 @@
 #!/usr/bin/python
 """Ansible module that turns Caps Lock on or off on macOS."""
 
-from __future__ import annotations
-
 import ctypes
 import ctypes.util
 
