@@ -13,6 +13,7 @@ Ansible playbook that sets up a new Mac for development and DevOps work, based o
 - [fastfetch](https://github.com/fastfetch-cli/fastfetch) and its preset
 - zsh with [zimfw](https://zimfw.sh/), and [atuin](https://atuin.sh/) shell history
 - Shared git settings, Git LFS and GnuPG
+- Caps Lock turned off, so it can't be switched on by accident
 
 The playbook runs locally with `ansible-playbook` and is safe to run again: every role only changes what differs from the desired state.
 
@@ -140,6 +141,7 @@ Each role has a tag, so you can apply one part at a time:
 | `fastfetch` | fastfetch |
 | `shell` | atuin and zsh (or `atuin`, `zsh` on their own) |
 | `git` | git |
+| `keyboard` | keyboard |
 
 ```bash
 uv run ansible-playbook -i hosts local.yml --tags ghostty
@@ -179,6 +181,7 @@ mac-config/
 │   ├── ghostty/                # Ghostty terminal, font, config and themes
 │   ├── git/                    # git settings, Git LFS and GnuPG
 │   ├── homebrew/               # Homebrew taps, formulae and casks
+│   ├── keyboard/               # Key remaps (Caps Lock off)
 │   ├── vscode/                 # VS Code, extensions, settings and font
 │   └── zsh/                    # zshrc, zimrc and zimfw modules
 ├── molecule/
@@ -355,6 +358,22 @@ Run just this role with:
 
 ```bash
 uv run ansible-playbook -i hosts local.yml --tags git
+```
+
+## Keyboard Role
+
+The keyboard role turns Caps Lock off on every keyboard, built-in or external, so it can't be switched on by accident.
+
+### What It Remaps
+
+- **Caps Lock**: Mapped to no action with macOS's built-in `hidutil`, the same as choosing **No Action** under System Settings → Keyboard → Keyboard Shortcuts… → Modifier Keys, but for all keyboards at once
+- **Caps Lock off first**: The role turns Caps Lock off before applying the remap, since the key can't turn it off afterwards. A small module in `roles/keyboard/library/caps_lock.py` does this through IOKit, the same state the key toggles
+- **LaunchAgent**: `hidutil` mappings are lost on restart, so `~/Library/LaunchAgents/local.mac-config.keyboard.plist` applies them again at each login. The playbook also applies them as soon as it installs or changes the LaunchAgent
+
+To remap other keys, edit `keyboard_key_mappings` in `roles/keyboard/defaults/main.yml`. If Caps Lock does end up stuck on, run the role again (a restart also turns it off). To undo the remap until the next login, run `hidutil property --set '{"UserKeyMapping":[]}'`; to remove it for good, also delete the LaunchAgent. Run just this role with:
+
+```bash
+uv run ansible-playbook -i hosts local.yml --tags keyboard
 ```
 
 ## Upcoming Roles

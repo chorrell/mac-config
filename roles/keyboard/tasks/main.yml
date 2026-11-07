@@ -1,0 +1,23 @@
+---
+# hidutil key mappings last until the Mac restarts, so a LaunchAgent applies
+# them again at each login. The handler applies them right away.
+
+# Once the key does nothing, Caps Lock can't be turned off with it, so turn it
+# off first (caps_lock is in this role's library/).
+- name: Turn Caps Lock off
+  caps_lock:
+    enabled: false
+
+# u+rwx leaves the group and other permissions of an existing directory alone
+- name: Create LaunchAgents directory
+  ansible.builtin.file:
+    path: "{{ ansible_facts['user_dir'] }}/Library/LaunchAgents"
+    state: directory
+    mode: u+rwx
+
+- name: Install key mapping LaunchAgent
+  ansible.builtin.template:
+    src: launch-agent.plist.j2
+    dest: "{{ keyboard_launch_agent }}"
+    mode: '0644'
+  notify: Apply key mappings

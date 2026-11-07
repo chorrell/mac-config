@@ -1,0 +1,12 @@
+---
+# keyboard role defaults
+
+# Key remaps applied with hidutil to every keyboard. Codes are 0x700000000 plus
+# the key's usage ID from the USB HID Keyboard/Keypad page; 0x700000000 on its
+# own means "no action".
+keyboard_key_mappings:
+  - HIDKeyboardModifierMappingSrc: 0x700000039  # Caps Lock
+    HIDKeyboardModifierMappingDst: 0x700000000  # No action
+
+keyboard_launch_agent_label: local.mac-config.keyboard
+keyboard_launch_agent: "{{ ansible_facts['user_dir'] }}/Library/LaunchAgents/{{ keyboard_launch_agent_label }}.plist"

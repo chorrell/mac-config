@@ -29,6 +29,8 @@
       tags: ['zsh', 'shell']
     - role: git
       tags: ['git']
+    - role: keyboard
+      tags: ['keyboard']
 
   post_tasks:
     - name: Configuration complete

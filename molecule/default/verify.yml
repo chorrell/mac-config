@@ -187,3 +187,20 @@
         grep -qx 'pinentry-program /opt/homebrew/bin/pinentry-mac'
         {{ ansible_facts['user_dir'] }}/.gnupg/gpg-agent.conf
       changed_when: false
+
+    - name: Load keyboard role defaults
+      ansible.builtin.include_vars:
+        file: ../../roles/keyboard/defaults/main.yml
+        name: keyboard_defaults
+
+    - name: Read the key mapping from the LaunchAgent
+      ansible.builtin.command: >-
+        plutil -extract ProgramArguments.3 raw -o -
+        {{ ansible_facts['user_dir'] }}/Library/LaunchAgents/{{ keyboard_defaults.keyboard_launch_agent_label }}.plist
+      register: keyboard_mapping
+      changed_when: false
+
+    - name: Verify the LaunchAgent remaps Caps Lock
+      ansible.builtin.assert:
+        that: (keyboard_mapping.stdout | from_json).UserKeyMapping == keyboard_defaults.keyboard_key_mappings
+        fail_msg: "The LaunchAgent does not apply keyboard_key_mappings"
