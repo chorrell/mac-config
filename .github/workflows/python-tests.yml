@@ -1,0 +1,54 @@
+---
+name: Python Tests
+
+on:
+  pull_request:
+    paths:
+      - 'roles/*/library/**'
+      - 'tests/**.py'
+      - '.github/workflows/python-tests.yml'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.python-version'
+  # Pull requests are tested by the pull_request trigger; only main needs a
+  # push trigger, to check the merged result
+  push:
+    branches:
+      - main
+    paths:
+      - 'roles/*/library/**'
+      - 'tests/**.py'
+      - '.github/workflows/python-tests.yml'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.python-version'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Cancel superseded runs on a PR, but let every push to main finish
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  pytest:
+    name: pytest
+    # The unit tests replace IOKit with a fake, so they don't need macOS
+    runs-on: ubuntu-slim
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e  # v10.3.2
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Run pytest
+        run: uv run pytest

@@ -1,0 +1,9 @@
+---
+- name: Apply key mappings
+  ansible.builtin.command:
+    argv:
+      - /usr/bin/hidutil
+      - property
+      - --set
+      - "{{ {'UserKeyMapping': keyboard_key_mappings} | to_json }}"
+  changed_when: true

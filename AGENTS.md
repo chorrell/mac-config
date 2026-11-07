@@ -1,7 +1,7 @@
 # AGENTS.md
 
 Ansible playbook that sets up a new Apple Silicon Mac for development and DevOps work: Homebrew tools, Ghostty,
-VS Code, Docker Desktop, fastfetch, zsh with zimfw, atuin and shared git settings. It runs locally with `ansible-playbook` against
+VS Code, Docker Desktop, fastfetch, zsh with zimfw, atuin, shared git settings and a Caps Lock remap. It runs locally with `ansible-playbook` against
 `localhost`. See `README.md` for what each role does.
 
 ## Commands
@@ -19,6 +19,9 @@ prek run --all-files                # everything, including markdownlint (needs 
 # Test bootstrap.sh (stubs everything; never runs the playbook)
 bats tests/
 
+# Unit tests for custom modules in roles/<role>/library/
+uv run pytest
+
 # Check without changing anything
 uv run ansible-playbook -i hosts local.yml --syntax-check
 uv run ansible-playbook -i hosts local.yml --check --diff
@@ -32,13 +35,13 @@ Use `--check --diff` to show what a change would do. CI runs the full Molecule t
 ## Layout
 
 ```text
-local.yml                  # Playbook: base, homebrew, ghostty, vscode, docker, fastfetch, atuin, zsh, git
+local.yml                  # Playbook: base, homebrew, ghostty, vscode, docker, fastfetch, atuin, zsh, git, keyboard
 roles/<role>/defaults/     # Settings and package lists
 roles/<role>/files/        # Config files copied to the Mac
 roles/<role>/tasks/        # Tasks
 group_vars/local.yml       # Per-machine overrides
 molecule/default/          # Molecule scenario for the whole playbook (verify.yml holds the checks)
-tests/                     # bats tests for bootstrap.sh
+tests/                     # bats tests for bootstrap.sh, pytest tests for custom modules
 .github/workflows/         # lint.yml, linting.yml (shell and Markdown), molecule.yml, bootstrap.yml
 ```
 
@@ -56,6 +59,9 @@ tests/                     # bats tests for bootstrap.sh
   `ansible_facts['user_dir']`.
 - **Homebrew lives in `/opt/homebrew`.** Pass `path: /opt/homebrew/bin` to the Homebrew modules. Third-party taps must
   be trusted (`trust: true`) or Homebrew refuses to load them.
+- **Custom modules** go in `roles/<role>/library/`, only when no module or Galaxy collection does the job. Add the
+  directory to `pythonpath` in `pyproject.toml` and unit tests in `tests/test_<module>.py`. Python is linted and
+  formatted with ruff (pre-commit hooks).
 - **Use FQCN** for all modules (`ansible.builtin.copy`, `community.general.homebrew`).
 - **Every new role** gets a tag in `local.yml`, checks in `molecule/default/verify.yml`, and a section in `README.md`.
   Verify tasks that run commands need `changed_when: false`. Markdown headings must be unique (markdownlint MD024).
