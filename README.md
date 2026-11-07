@@ -190,12 +190,14 @@ mac-config/
 │       ├── converge.yml
 │       └── verify.yml
 ├── tests/
-│   └── bootstrap.bats          # bats tests for bootstrap.sh
+│   ├── bootstrap.bats          # bats tests for bootstrap.sh
+│   └── test_caps_lock.py       # pytest tests for the caps_lock module
 └── .github/workflows/
     ├── bootstrap.yml           # bats tests for bootstrap.sh on macOS
     ├── lint.yml                # ansible-lint and yamllint
     ├── linting.yml             # Shell script and Markdown lint
-    └── molecule.yml            # Molecule test on macOS
+    ├── molecule.yml            # Molecule test on macOS
+    └── python-tests.yml        # pytest unit tests for custom modules
 ```
 
 ## Base Role
@@ -484,12 +486,24 @@ uv run ansible-galaxy collection install -r collections/requirements.yml
 bats tests/
 ```
 
+### Test the Custom Modules
+
+`tests/test_caps_lock.py` unit-tests the keyboard role's `caps_lock` module with IOKit replaced by a fake, so it runs on any OS without touching the keyboard. Molecule exercises the real IOKit calls on macOS:
+
+```bash
+uv run pytest
+```
+
 ### Run Linting Only
 
 ```bash
 # YAML and Ansible
 uv run yamllint .
 uv run ansible-lint
+
+# Python
+prek run ruff-check --all-files
+prek run ruff-format --all-files
 
 # Markdown (the hook runs markdownlint-cli2 in Docker)
 prek run markdownlint-cli2-docker --all-files
@@ -506,6 +520,7 @@ pre-commit that reads the same `.pre-commit-config.yaml`. This repo runs:
 - **markdownlint**: Markdown formatting (needs Docker)
 - **zizmor**: GitHub Actions workflow linting and security. actionlint isn't used because it rejects GitHub's `$/` self-repository `uses:` syntax ([rhysd/actionlint#711](https://github.com/rhysd/actionlint/issues/711))
 - **gitleaks**: Catches committed secrets
+- **ruff**: Python linting (`ruff-check`, fixing what it can) and formatting (`ruff-format`) for custom modules and their tests, configured in `pyproject.toml`
 - **shellcheck** and **shfmt**: Shell script checks and formatting for `bootstrap.sh`, with the same versions and flags as the `linting` workflow
 - Standard file checks: trailing whitespace, end of file, YAML syntax, merge conflict markers, large files and line endings
 
@@ -548,6 +563,7 @@ GitHub Actions runs these workflows:
 
 - **Lint** (ansible-lint and yamllint) and **Molecule** run on pull requests, and again on pushes to `main` to check the merged result. Both only run when roles, playbooks, Molecule files, their own workflow or the Python dependencies change
 - **Bootstrap Tests** runs the bats tests for `bootstrap.sh` on every pull request (it is a required check), and on pushes to `main` that change the script, its tests or the workflow
+- **Python Tests** runs the pytest unit tests for custom modules on pull requests and pushes to `main` that change a role's `library/`, the tests or the Python dependencies
 - **linting** (shellcheck, shfmt and markdownlint) runs on pull requests to `main`
 
 Pushes to a pull request's branch are covered by the pull request run, so each change is tested once. A new push to a pull request cancels the run still in progress for it.

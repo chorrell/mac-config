@@ -13,8 +13,29 @@ dependencies = [
 dev = [
     "ansible-lint>=26.9",
     "molecule>=26.0",
+    "pytest>=9.2",
     "yamllint>=1.38",
 ]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E", "W",  # pycodestyle
+    "F",       # pyflakes
+    "I",       # isort
+    "B",       # bugbear
+    "UP",      # pyupgrade
+    "SIM",     # simplify
+    "PT",      # pytest style
+    "RUF",     # ruff-specific
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Custom modules live in role library/ directories, not an installed package
+pythonpath = ["roles/keyboard/library"]
 
 [tool.uv]
 package = false
