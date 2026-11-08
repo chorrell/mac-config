@@ -42,7 +42,7 @@ roles/<role>/tasks/        # Tasks
 group_vars/local.yml       # Per-machine overrides
 molecule/default/          # Molecule scenario for the whole playbook (verify.yml holds the checks)
 tests/                     # bats tests for bootstrap.sh, pytest tests for custom modules
-.github/workflows/         # lint.yml, linting.yml (shell and Markdown), molecule.yml, bootstrap.yml
+.github/workflows/         # lint.yml, linting.yml (shell and Markdown), molecule.yml, bootstrap.yml, python-tests.yml
 ```
 
 ## Conventions
@@ -70,6 +70,8 @@ tests/                     # bats tests for bootstrap.sh, pytest tests for custo
 
 - All changes go through a pull request; `main` is protected. Branch from `main` as `feature/<description>` or
   `fix/<description>`, usually one role or change per PR.
+- Required checks are set in `chorrell/github-settings` (`repos.yaml`). A workflow with a required check runs on every
+  `pull_request`, with no `paths` filter: a skipped required check never reports and blocks the merge.
 - Commit messages and PR titles use conventional commits (`feat: ...`, `fix(zsh): ...`, `chore(deps): ...`,
   `docs: ...`, `ci: ...`).
 - Keep PR descriptions brief: a few bullets or one paragraph on what changed and why. No Problem/Solution/Changes

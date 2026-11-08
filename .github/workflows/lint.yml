@@ -2,18 +2,9 @@
 name: Lint
 
 on:
+  # Every pull request, since Ansible Lint and YAML Lint are required (a
+  # required check that is skipped by a path filter would block the merge)
   pull_request:
-    paths:
-      - 'roles/**'
-      - 'molecule/**'
-      - '*.yml'
-      - '.github/workflows/lint.yml'
-      - '.ansible-lint'
-      - 'collections/requirements.yml'
-      - '.yamllint'
-      - 'pyproject.toml'
-      - 'uv.lock'
-      - '.python-version'
   # Pull requests are tested by the pull_request trigger; only main needs a
   # push trigger, to check the merged result
   push:
