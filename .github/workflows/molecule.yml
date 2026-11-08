@@ -2,19 +2,9 @@
 name: Molecule Testing
 
 on:
+  # Every pull request, since Test Complete Playbook is required (a required check
+  # that is skipped by a path filter would block the merge)
   pull_request:
-    paths:
-      - 'roles/**'
-      - 'molecule/**'
-      - 'local.yml'
-      - 'hosts'
-      - 'ansible.cfg'
-      - 'group_vars/**'
-      - 'collections/requirements.yml'
-      - '.github/workflows/molecule.yml'
-      - 'pyproject.toml'
-      - 'uv.lock'
-      - '.python-version'
   # Pull requests are tested by the pull_request trigger; only main needs a
   # push trigger, to check the merged result
   push:
