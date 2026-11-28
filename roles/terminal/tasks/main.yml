@@ -1,0 +1,30 @@
+---
+# Terminal.app ships with macOS, so there is nothing to install apart from the
+# profile's font. Terminal keeps its settings in memory: quit and reopen it to
+# see changes made while it is running.
+
+- name: Install MesloLGS NF fonts
+  ansible.builtin.get_url:
+    url: "{{ terminal_font_base_url }}/{{ item.name | urlencode }}"
+    dest: "{{ terminal_fonts_dir }}/{{ item.name }}"
+    checksum: "sha256:{{ item.sha256 }}"
+    mode: '0644'
+  loop: "{{ terminal_fonts }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+# terminal_profile is in this role's library/
+- name: Import the Terminal profile
+  terminal_profile:
+    name: "{{ terminal_profile_name }}"
+    src: "{{ role_path }}/files/{{ terminal_profile_file }}"
+
+- name: Apply Terminal settings
+  community.general.osx_defaults:
+    domain: com.apple.Terminal
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+  loop: "{{ terminal_settings }}"
+  loop_control:
+    label: "{{ item.key }}"

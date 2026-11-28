@@ -37,24 +37,38 @@
         quiet: true
       loop: "{{ homebrew_casks }}"
 
-    - name: Verify Ghostty is installed
-      ansible.builtin.stat:
-        path: /Applications/Ghostty.app
-      register: ghostty_app
-      failed_when: not ghostty_app.stat.exists
-
     - name: Verify MesloLGS NF fonts are installed
       ansible.builtin.stat:
         path: "{{ ansible_facts['user_dir'] }}/Library/Fonts/MesloLGS NF {{ item }}.ttf"
-      register: ghostty_font
-      failed_when: not ghostty_font.stat.exists
+      register: terminal_font
+      failed_when: not terminal_font.stat.exists
       loop: [Regular, Bold, Italic, Bold Italic]
 
-    - name: Validate the Ghostty config, including the custom theme
-      ansible.builtin.command: >-
-        /Applications/Ghostty.app/Contents/MacOS/ghostty +validate-config
-        --config-file={{ ansible_facts['user_dir'] }}/.config/ghostty/config
+    - name: Load terminal role defaults
+      ansible.builtin.include_vars:
+        file: ../../roles/terminal/defaults/main.yml
+        name: terminal_defaults
+
+    # Read through defaults (cfprefsd); the plist file on disk can lag behind
+    - name: Verify the Terminal profile is imported
+      ansible.builtin.shell: >-
+        set -o pipefail &&
+        defaults export com.apple.Terminal - |
+        plutil -extract "Window Settings.{{ terminal_defaults.terminal_profile_name }}.name" raw -o - -
+      args:
+        executable: /bin/bash
+      register: terminal_profile_check
       changed_when: false
+      failed_when: terminal_profile_check.stdout != terminal_defaults.terminal_profile_name
+
+    - name: Verify Terminal opens new windows with the profile
+      ansible.builtin.command: defaults read com.apple.Terminal "{{ item }}"
+      register: terminal_default
+      changed_when: false
+      failed_when: terminal_default.stdout != terminal_defaults.terminal_profile_name
+      loop:
+        - Default Window Settings
+        - Startup Window Settings
 
     - name: Verify VS Code is installed
       ansible.builtin.stat:

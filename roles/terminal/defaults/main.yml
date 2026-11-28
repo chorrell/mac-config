@@ -1,0 +1,41 @@
+---
+# Terminal role defaults
+
+# Profile exported from Terminal.app (Settings > Profiles > ... > Export),
+# saved in roles/terminal/files/. It is imported under this name and made the
+# default profile for new windows.
+terminal_profile_name: Panic Palette
+terminal_profile_file: Panic Palette.terminal
+
+# Top-level Terminal settings, written one at a time with osx_defaults
+terminal_settings:
+  - key: Default Window Settings
+    type: string
+    value: "{{ terminal_profile_name }}"
+  - key: Startup Window Settings
+    type: string
+    value: "{{ terminal_profile_name }}"
+  # New tabs open with the same profile (0: the default profile)
+  - key: NewTabSettingsBehavior
+    type: int
+    value: 1
+  # New tabs open in the same working directory (0: home directory)
+  - key: NewTabWorkingDirectoryBehavior
+    type: int
+    value: 1
+
+# MesloLGS NF (Meslo patched with Nerd Font glyphs), the font of the Terminal
+# profile and the VS Code integrated terminal. Downloaded from a pinned commit
+# and checked against the SHA-256 of each file.
+terminal_fonts_dir: "{{ ansible_facts['user_dir'] }}/Library/Fonts"
+terminal_font_base_url: >-
+  https://github.com/romkatv/powerlevel10k-media/raw/145eb9fbc2f42ee408dacd9b22d8e6e0e553f83d
+terminal_fonts:
+  - name: MesloLGS NF Regular.ttf
+    sha256: d97946186e97f8d7c0139e8983abf40a1d2d086924f2c5dbf1c29bd8f2c6e57d
+  - name: MesloLGS NF Bold.ttf
+    sha256: b6c0199cf7c7483c8343ea020658925e6de0aeb318b89908152fcb4d19226003
+  - name: MesloLGS NF Italic.ttf
+    sha256: 6f357bcbe2597704e157a915625928bca38364a89c22a4ac36e7a116dcd392ef
+  - name: MesloLGS NF Bold Italic.ttf
+    sha256: 56b4131adecec052c4b324efb818dd326d586dbc316fc68f98f1cae2eb8d1220

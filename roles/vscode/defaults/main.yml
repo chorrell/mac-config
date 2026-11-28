@@ -40,7 +40,7 @@ vscode_extensions:
 # listed here are left alone; a listed key replaces its whole value.
 vscode_settings:
   # Editor
-  # Hack (https://sourcefoundry.org/hack/); the terminal font, MesloLGS NF, comes from the ghostty role
+  # Hack (https://sourcefoundry.org/hack/); the terminal font, MesloLGS NF, comes from the terminal role
   editor.fontFamily: Hack, Menlo, monospace
   editor.fontLigatures: true
   editor.minimap.enabled: false

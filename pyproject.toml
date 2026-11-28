@@ -35,7 +35,7 @@ select = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 # Custom modules live in role library/ directories, not an installed package
-pythonpath = ["roles/keyboard/library"]
+pythonpath = ["roles/keyboard/library", "roles/terminal/library"]
 
 [tool.uv]
 package = false
