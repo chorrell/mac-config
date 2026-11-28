@@ -38,6 +38,15 @@ setopt CORRECT
 # Remove path separator from WORDCHARS.
 WORDCHARS=${WORDCHARS//[\/]}
 
+#
+# Terminal colors
+#
+
+# Advertise 24-bit color to TUI apps (lipgloss/termenv, etc.) in terminals that
+# don't set COLORTERM themselves, such as Terminal.app. A value the terminal
+# sets is kept.
+export COLORTERM="${COLORTERM:-truecolor}"
+
 # -----------------
 # Zim configuration
 # -----------------
