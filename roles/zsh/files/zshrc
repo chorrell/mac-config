@@ -154,6 +154,10 @@ setopt hist_verify            # show command with history expansion to user befo
 setopt share_history          # share command history data
 
 ## PATH
+# Homebrew's curl is keg-only, so put it ahead of the macOS /usr/bin/curl
+if [[ -d /opt/homebrew/opt/curl/bin ]]; then
+  export PATH="/opt/homebrew/opt/curl/bin:$PATH"
+fi
 export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 
 ## Aliases
