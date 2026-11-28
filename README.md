@@ -307,7 +307,7 @@ The zsh role sets up the shell with [zimfw](https://zimfw.sh/), and the atuin ro
 
 ### What They Configure
 
-- **zshrc**: `roles/zsh/files/zshrc` is copied to `~/.zshrc`. It runs fastfetch, initializes zimfw, sets the history options and aliases, sets `COLORTERM=truecolor` when the terminal doesn't (Terminal.app), and activates mise and atuin when they are installed
+- **zshrc**: `roles/zsh/files/zshrc` is copied to `~/.zshrc`. It runs fastfetch, initializes zimfw, sets the history options and aliases, puts Homebrew's keg-only curl ahead of the macOS one on the `PATH`, sets `COLORTERM=truecolor` when the terminal doesn't (Terminal.app), and activates mise and atuin when they are installed
 - **zimrc**: `roles/zsh/files/zimrc` is copied to `~/.zimrc`, listing the zim modules (bira prompt, completions, syntax highlighting, history substring search, autosuggestions, Homebrew and direnv)
 - **zimfw**: Downloaded to `~/.zim`, with the modules installed. Changing `zimrc` reinstalls the modules on the next run
 - **atuin**: Installed as a Homebrew formula, with `roles/atuin/files/config.toml` copied to `~/.config/atuin/config.toml` (daemon-backed fuzzy search, enter runs the command, ctrl+number shortcuts). The up arrow stays with zsh-history-substring-search; atuin is on ctrl+r

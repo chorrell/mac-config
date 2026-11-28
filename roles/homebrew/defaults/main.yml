@@ -43,6 +43,8 @@ homebrew_formulae:
   - uv
   # Networking and system
   - btop
+  # Keg-only (macOS has its own curl); the zshrc puts it first on the PATH
+  - curl
   - domcyrus/rustnet/rustnet
   - htop
   - pwgen
