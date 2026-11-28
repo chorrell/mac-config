@@ -169,6 +169,8 @@
 	</data>
 	<key>CursorType</key>
 	<integer>0</integer>
+	<key>EnableSmoothResizing</key>
+	<true/>
 	<key>Font</key>
 	<data>
 	YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMS
@@ -285,7 +287,17 @@
 	ANMA4ADoAPUBCgEdASoBLAE7AT0BPwFBAUoBTwFVAV0BXwFhAWMBZRMFEwoTFRMeEysT
 	LhM7E0QTSRNRAAAAAAAAAgEAAAAAAAAANwAAAAAAAAAAAAAAAAAAE1Q=
 	</data>
+	<key>ShowComponentsWhenTabHasCustomTitle</key>
+	<false/>
+	<key>ShowRepresentedURLInTitle</key>
+	<true/>
 	<key>ShowRepresentedURLPathInTitle</key>
+	<true/>
+	<key>ShowShellCommandInTitle</key>
+	<false/>
+	<key>ShowTTYNameInTabTitle</key>
+	<false/>
+	<key>ShowWindowSettingsNameInTitle</key>
 	<false/>
 	<key>TerminalType</key>
 	<string>xterm-256color</string>
