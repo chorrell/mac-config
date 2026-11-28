@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Ansible playbook that sets up a new Apple Silicon Mac for development and DevOps work: Homebrew tools, Ghostty,
+Ansible playbook that sets up a new Apple Silicon Mac for development and DevOps work: Homebrew tools, Terminal.app,
 VS Code, Docker Desktop, fastfetch, zsh with zimfw, atuin, shared git settings and a Caps Lock remap. It runs locally with `ansible-playbook` against
 `localhost`. See `README.md` for what each role does.
 
@@ -35,7 +35,7 @@ Use `--check --diff` to show what a change would do. CI runs the full Molecule t
 ## Layout
 
 ```text
-local.yml                  # Playbook: base, homebrew, ghostty, vscode, docker, fastfetch, atuin, zsh, git, keyboard
+local.yml                  # Playbook: base, homebrew, terminal, vscode, docker, fastfetch, atuin, zsh, git, keyboard
 roles/<role>/defaults/     # Settings and package lists
 roles/<role>/files/        # Config files copied to the Mac
 roles/<role>/tasks/        # Tasks

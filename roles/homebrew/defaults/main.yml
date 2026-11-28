@@ -2,7 +2,7 @@
 # Homebrew role defaults
 #
 # Homebrew itself is installed by bootstrap.sh before Ansible runs. Tools that
-# come with their own configuration (Ghostty, fastfetch, atuin, git, ...) are
+# come with their own configuration (fastfetch, atuin, git, ...) are
 # installed by their own roles, not listed here.
 
 homebrew_prefix: /opt/homebrew

@@ -7,7 +7,7 @@
 Ansible playbook that sets up a new Mac for development and DevOps work, based on the setup of my current Mac. Clone the repository and run one script to get:
 
 - Homebrew and the command-line toolset (infrastructure as code, Kubernetes, linters and more)
-- The [Ghostty](https://ghostty.org/) terminal, with its config, theme and font
+- Terminal.app with the Panic Palette profile and its font as the default
 - [VS Code](https://code.visualstudio.com/) with its extensions and settings
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [fastfetch](https://github.com/fastfetch-cli/fastfetch) and its preset
@@ -135,7 +135,7 @@ Each role has a tag, so you can apply one part at a time:
 | --- | --- |
 | `system` | base |
 | `brew` | homebrew |
-| `ghostty` | ghostty |
+| `terminal` | terminal |
 | `vscode` | vscode |
 | `docker` | docker |
 | `fastfetch` | fastfetch |
@@ -144,7 +144,7 @@ Each role has a tag, so you can apply one part at a time:
 | `keyboard` | keyboard |
 
 ```bash
-uv run ansible-playbook -i hosts local.yml --tags ghostty
+uv run ansible-playbook -i hosts local.yml --tags terminal
 ```
 
 ### Dry run (check mode)
@@ -178,10 +178,10 @@ mac-config/
 │   ├── base/                   # Base directories
 │   ├── docker/                 # Docker Desktop
 │   ├── fastfetch/              # fastfetch and its preset
-│   ├── ghostty/                # Ghostty terminal, font, config and themes
 │   ├── git/                    # git settings, Git LFS and GnuPG
 │   ├── homebrew/               # Homebrew taps, formulae and casks
 │   ├── keyboard/               # Key remaps (Caps Lock off)
+│   ├── terminal/               # Terminal.app profile, settings and font
 │   ├── vscode/                 # VS Code, extensions, settings and font
 │   └── zsh/                    # zshrc, zimrc and zimfw modules
 ├── molecule/
@@ -191,7 +191,8 @@ mac-config/
 │       └── verify.yml
 ├── tests/
 │   ├── bootstrap.bats          # bats tests for bootstrap.sh
-│   └── test_caps_lock.py       # pytest tests for the caps_lock module
+│   ├── test_caps_lock.py       # pytest tests for the caps_lock module
+│   └── test_terminal_profile.py # pytest tests for the terminal_profile module
 └── .github/workflows/
     ├── bootstrap.yml           # bats tests for bootstrap.sh on macOS
     ├── lint.yml                # ansible-lint and yamllint
@@ -218,7 +219,7 @@ The homebrew role installs the development and DevOps toolset. Homebrew itself i
 - **Formulae**: Installs the command-line tools in `homebrew_formulae`
 - **Casks**: Installs the applications in `homebrew_casks`
 
-Packages are only ever installed, never upgraded or removed. Tools that come with their own configuration (such as Ghostty and fastfetch) are installed by their own roles rather than listed here.
+Packages are only ever installed, never upgraded or removed. Tools that come with their own configuration (such as fastfetch and atuin) are installed by their own roles rather than listed here.
 
 To change the toolset, edit the lists in `roles/homebrew/defaults/main.yml`, or override them in `group_vars/local.yml`. Run just this role with:
 
@@ -226,21 +227,20 @@ To change the toolset, edit the lists in `roles/homebrew/defaults/main.yml`, or 
 uv run ansible-playbook -i hosts local.yml --tags brew
 ```
 
-## Ghostty Role
+## Terminal Role
 
-The ghostty role installs the [Ghostty](https://ghostty.org/) terminal and applies the preferred settings.
+The terminal role sets up Terminal.app, which comes with macOS, with the preferred profile and settings.
 
-### What It Sets Up
+### What the Terminal Role Configures
 
-- **Ghostty**: Installed as a Homebrew cask
 - **Font**: MesloLGS NF (Meslo with Nerd Font glyphs) in `~/Library/Fonts`, downloaded from a pinned commit of [romkatv/powerlevel10k-media](https://github.com/romkatv/powerlevel10k-media) and verified by SHA-256
-- **Config**: `roles/ghostty/files/config` is copied to `~/.config/ghostty/config` (any existing file is backed up first)
-- **Themes**: Custom themes in `roles/ghostty/files/themes/` are copied to `~/.config/ghostty/themes/`, including `panic`, a port of the Panic palette from macOS Terminal
+- **Profile**: `roles/terminal/files/Panic Palette.terminal` is imported as the Panic Palette profile (colours, MesloLGS NF, 125 columns, blinking block cursor, no bell, Option as Meta). The `terminal_profile` module in the role's `library/` merges the file's settings into the profile, so settings the file does not list are left alone, and other profiles are untouched
+- **Settings**: Each entry in `terminal_settings` is written with `osx_defaults`. By default these make Panic Palette the profile for new windows and the one used at startup, and open new tabs with the same profile and working directory
 
-To change a setting, edit `roles/ghostty/files/config`. Molecule runs `ghostty +validate-config` against the installed config, which also catches a missing theme. Run just this role with:
+To change the profile, edit it in Terminal (Settings > Profiles), export it over `roles/terminal/files/Panic Palette.terminal` with the profile menu's Export, and commit the file. Terminal keeps its settings in memory, so after the first run quit and reopen Terminal to see them; if a running Terminal writes its old settings back, the next run applies them again. Run just this role with:
 
 ```bash
-uv run ansible-playbook -i hosts local.yml --tags ghostty
+uv run ansible-playbook -i hosts local.yml --tags terminal
 ```
 
 ## VS Code Role
@@ -251,7 +251,7 @@ The vscode role installs [Visual Studio Code](https://code.visualstudio.com/), i
 
 - **VS Code**: Installed as a Homebrew cask, unless `/Applications/Visual Studio Code.app` already exists (for example from a download)
 - **`code` CLI**: Linked into `/opt/homebrew/bin`, so it is on the `PATH` either way
-- **Fonts**: The editor uses [Hack](https://sourcefoundry.org/hack/), installed from the `font-hack` cask. The integrated terminal uses MesloLGS NF from the ghostty role
+- **Fonts**: The editor uses [Hack](https://sourcefoundry.org/hack/), installed from the `font-hack` cask. The integrated terminal uses MesloLGS NF from the terminal role
 - **Extensions**: Each entry in `vscode_extensions` is installed with `code --install-extension` if missing. Other installed extensions are left alone
 - **Settings**: Each entry in `vscode_settings` is merged into `~/Library/Application Support/Code/User/settings.json` (any existing file is backed up first), so settings that are not listed are left alone. The file must be plain JSON: the role stops rather than drop comments
 
